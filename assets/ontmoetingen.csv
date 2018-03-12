@@ -1,0 +1,28 @@
+﻿# eerste kolom bevat de omschrijving van de ontmoeting;;;;;
+# tweede kolom bevat de gevecht consequentie (Fry);;;;;
+# derde kolom bevat de onderhandeltekst (Leela);;;;;
+# vierde kolom bevat de onderhandelconsequentie (Leela);;;;;
+# vijfde kolom bevat de onderhands success consequentie (Bender);;;;;
+# zesde kolom bevat de onderhands gefaald consequentie (Bender);;;;;
+Anti-Human Patrol;[1-6];These humans are guilty of the crime of being humans!;[3-18];[3-18];Crew is disguised as robots.
+Giant Space Bee;[1-6];Bzzzzzz;[2-12];[2-12];Steal some space honey. [vp+1]
+Space Bee Queen;[3-18];You try keeping your figure after 10,000 kids.;[1-6];[3-18];Steal some space honey. [vp+1]
+Hydroponic Farmer;[1-6];Looky here city girl, oxygen don't grow on trees. ;[0];[2-12];Bender romances the Crushinator robot
+Lrrr, Emperor of the planet Omicron Persei 8;[5-30];'Friends' is ancient Earth's most foolish program. Why does Ross, the largest friend, not simply eat the other five?;[0];Lrrr invades earth and steals a victory point. [vp-1];Crew escapes from Lrrr
+Mom from Momcorp;[2-12]; I don't know. I guess Mother's Day just puts me in a bad mood.;[1-6];[2-12];Leela knocks out Mom's sons and the crew escapes.
+Moon Worm;[1-6];*chomp*;[3-18];Bender steals a worthless rock.;I have ridden the mighty Moon Worm!
+Big Rock Alien;[4-24];I have nothing to do for the next eight million years.;[0];[4-24];Crew manages to escape the big rock alien.
+El Chupanibre;[2-12];*chomp*;[3-18];[2-12];"""He creeps and crawls in the midnight hush,
+Silent as a low-flow toilet flush,
+Watch your step,
+'Cause sooner or later,
+He'll eat you whole,
+And half your alligator."""
+Bone Vampire;[3-18];He's not a bone vampire, he's mister Peppy!;[0];[3-18];Bender steals another bone vampire egg [vp+1]
+Purple Fruit Snake;[1-6];Purple fruit snakes are nearly extinct;[1-6];[1-6];Nibbler ate the purple fruit snake.
+Space Pirates;[2-12];Too late do I realize that me children are me only real treasures. ;[1-6];[2-12];Bender takes charge of the space pirates [vp+1]
+Captain Zapp Brannigan;[4-24];So you thought you could conquer us that easily, eh?! Nice job. We surrender.;[0];Zapp manages to trip over a victory point and break it [vp-1];Zapp: I surrender and volunteer for treason.
+Robot Mafia;[2-12];Well, well, well. What have we here? No, seriously. What is that?;[0];Bender gets made, but the crew gets nothing.;Bender quits organized crime and sticks to thre regular kind.
+Nibblionians;[0-1];When the universe was forged in the crucible of the Big Bang, our mighty race was already 17 years old.;[repair];Bender wasn't able to steal anything of value.;Steal some dark matter. [vp+1]
+Hypnotoad;[0];You want to give hypnotoad a victory point. You give hypnotoad a victory point. You are happy you gave hypnotoad a victory point.;[vp-1];ALL GLORY TO THE HYPNOTOAD! [vp-1];The crew manages to avoid the hypnotoad.
+Brain Spawn;[2-12];Our calculations are always correct, for we are gigantic brains.;[2-12];[2-12];Fry manages to outwit the brains by being unaffected by the stupefaction field.
