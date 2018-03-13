@@ -13,3 +13,6 @@ add_library(${FUTURAMA_APP_CLIENT_TARGET_NAME}
 
 target_include_directories(${FUTURAMA_APP_CLIENT_TARGET_NAME}
     PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
+
+target_link_libraries(${MACHIAVELLI_VIEW_CLIENT_CLI_TARGET_NAME}
+    "futurama-domain-common")
