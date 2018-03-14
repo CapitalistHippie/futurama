@@ -5,10 +5,9 @@
 
 namespace fut::domain::models
 {
-template<unsigned int columns, unsigned int rows>
 struct Sector
 {
-    SectorField fields[columns][rows];
+    SectorField fields[10][10];
 }; // struct Sector
 } // namespace fut::domain::models
 

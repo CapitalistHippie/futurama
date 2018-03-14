@@ -6,14 +6,10 @@
 
 namespace fut::domain::models
 {
-template<unsigned int sectorColumns,
-         unsigned int sectorRows,
-         unsigned int sectorFieldColumns,
-         unsigned int sectorFieldRows>
 struct Universe
 {
-    Scan<columns, rows> scan;
-    Sector<sectorFieldColumns, sectorFieldRows>* sectors[columns][rows];
+    Scan scan;
+    Sector* sectors[5][5];
 }; // struct Universe
 } // namespace fut::domain::models
 

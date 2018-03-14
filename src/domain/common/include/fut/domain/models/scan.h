@@ -5,10 +5,9 @@
 
 namespace fut::domain::models
 {
-template<unsigned int columns, unsigned int rows>
 struct Scan
 {
-    ScanSector sectors[columns][rows];
+    ScanSector sectors[5][5];
 }; // struct Scan
 } // namespace fut::domain::models
 

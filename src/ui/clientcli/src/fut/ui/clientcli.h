@@ -5,6 +5,9 @@
 #include <ostream>
 
 #include <fut/app/client.h>
+#include <fut/infra/subject.h>
+
+#include "fut/ui/commandparser.h"
 
 namespace fut::ui
 {
@@ -18,6 +21,9 @@ class ClientCli
 
     bool isRunning;
     bool shouldStop;
+
+    CommandParser commandParser;
+    infra::Subject commandSubject;
 
   public:
     ClientCli(app::Client& client, std::istream& inputStream, std::ostream& outputStream);
