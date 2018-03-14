@@ -7,7 +7,10 @@ namespace fut::domain::models
 {
 struct Sector
 {
-    SectorField fields[10][10];
+    static const unsigned int ColumnCount = 10;
+    static const unsigned int RowCount = 10;
+
+    SectorField fields[ColumnCount][RowCount];
 }; // struct Sector
 } // namespace fut::domain::models
 

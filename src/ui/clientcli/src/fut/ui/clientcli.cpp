@@ -4,9 +4,26 @@
 #include <system_error>
 
 #include "fut/ui/command.h"
+#include "fut/ui/statehandlerstopped.h"
 
 using namespace fut;
 using namespace fut::ui;
+
+void ClientCli::SetStateHandler(StateHandler* stateHandler)
+{
+    if (activeStateHandler != nullptr)
+    {
+        activeStateHandler->ExitState();
+        delete activeStateHandler;
+    }
+
+    activeStateHandler = stateHandler;
+
+    if (activeStateHandler != nullptr)
+    {
+        activeStateHandler->EnterState();
+    }
+}
 
 ClientCli::ClientCli(app::Client& client, std::istream& inputStream, std::ostream& outputStream)
   : client(&client)
@@ -14,7 +31,16 @@ ClientCli::ClientCli(app::Client& client, std::istream& inputStream, std::ostrea
   , outputStream(&outputStream)
   , isRunning(false)
   , shouldStop(false)
+  , activeStateHandler(nullptr)
 {
+}
+
+ClientCli::~ClientCli() noexcept
+{
+    if (activeStateHandler != nullptr)
+    {
+        delete activeStateHandler;
+    }
 }
 
 void ClientCli::Start()
@@ -35,7 +61,8 @@ void ClientCli::Start()
     commandSubject.RegisterPredicateObserver<Command>(
       [](const Command& command) { return strcmp(command.name, "stop") == 0; }, stopCommandHandler);
 
-    client->StartGame();
+    // TODO: Set starting state handler based on current client and game state.
+    SetStateHandler<StateHandlerStopped>();
 
     do
     {

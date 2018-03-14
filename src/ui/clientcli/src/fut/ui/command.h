@@ -6,7 +6,7 @@ namespace fut::ui
 struct Command
 {
     char name[64];
-}; // class Command
+}; // struct Command
 } // namespace fut::ui
 
 #endif // FUTURAMA_FUT_UI_COMMAND_H_INCLUDED

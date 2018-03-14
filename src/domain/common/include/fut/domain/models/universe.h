@@ -9,7 +9,7 @@ namespace fut::domain::models
 struct Universe
 {
     Scan scan;
-    Sector* sectors[5][5];
+    Sector* sectors[Scan::ColumnCount][Scan::RowCount];
 }; // struct Universe
 } // namespace fut::domain::models
 

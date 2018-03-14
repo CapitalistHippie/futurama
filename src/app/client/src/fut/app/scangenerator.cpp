@@ -12,9 +12,9 @@ domain::models::Scan ScanGenerator::GenerateScan() const
 {
     domain::models::Scan scan;
 
-    for (unsigned int i = 0; i < 5; ++i)
+    for (unsigned int i = 0; i < domain::models::Scan::ColumnCount; ++i)
     {
-        for (unsigned int ii = 0; ii < 5; ++ii)
+        for (unsigned int ii = 0; ii < domain::models::Scan::RowCount; ++ii)
         {
             scan.sectors[i][ii].asteroids = randomNumberGenerator->GenerateBetweenInclusive(0, 9);
             scan.sectors[i][ii].meetings = randomNumberGenerator->GenerateBetweenInclusive(0, 3);
