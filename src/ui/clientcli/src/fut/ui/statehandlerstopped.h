@@ -7,6 +7,9 @@ namespace fut::ui
 {
 class StateHandlerStopped : public StateHandlerBase
 {
+  private:
+    void StartCommandHandler() const;
+
   public:
     using StateHandlerBase::StateHandlerBase;
 
