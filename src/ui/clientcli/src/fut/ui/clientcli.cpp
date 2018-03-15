@@ -54,11 +54,11 @@ void ClientCli::Start()
 
     auto stopCommandHandler = std::bind(&ClientCli::Stop, this);
 
-    commandSubject.RegisterPredicateObserver<Command>(
+    commandsSubject.RegisterPredicateObserver<Command>(
       [](const Command& command) { return strcmp(command.name, "quit") == 0; }, stopCommandHandler);
-    commandSubject.RegisterPredicateObserver<Command>(
+    commandsSubject.RegisterPredicateObserver<Command>(
       [](const Command& command) { return strcmp(command.name, "exit") == 0; }, stopCommandHandler);
-    commandSubject.RegisterPredicateObserver<Command>(
+    commandsSubject.RegisterPredicateObserver<Command>(
       [](const Command& command) { return strcmp(command.name, "stop") == 0; }, stopCommandHandler);
 
     // TODO: Set starting state handler based on current client and game state.
@@ -69,7 +69,7 @@ void ClientCli::Start()
         try
         {
             auto command = commandParser.ParseCommand(*inputStream);
-            commandSubject.NotifyObservers(command);
+            commandsSubject.NotifyObservers(command);
         }
         catch (const std::system_error& e)
         {
@@ -89,7 +89,7 @@ void ClientCli::Start()
     } while (!shouldStop);
 
     // Cleanup should be done here.
-    commandSubject.Clear();
+    commandsSubject.Clear();
 
     isRunning = false;
     shouldStop = false;

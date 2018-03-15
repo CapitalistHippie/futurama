@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include <fut/domain/events/gamestarted.h>
+
 using namespace fut;
 using namespace fut::app;
 
@@ -26,6 +28,10 @@ void Client::StartGame()
 
     // Initialize the game.
     game.universe.scan = scanGenerator.GenerateScan();
+
+    // Throw game started event.
+    domain::events::GameStarted gameStartedEvent;
+    eventsSubject.NotifyObservers(gameStartedEvent);
 }
 
 void Client::StopGame()

@@ -3,6 +3,7 @@
 
 #include <fut/domain/models/game.h>
 #include <fut/infra/randomnumbergenerator.h>
+#include <fut/infra/subject.h>
 
 #include "fut/app/scangenerator.h"
 
@@ -18,6 +19,8 @@ class Client
     bool isGameRunning;
 
   public:
+    infra::Subject eventsSubject;
+
     Client(infra::RandomNumberGenerator& randomNumberGenerator);
 
     void StartGame();

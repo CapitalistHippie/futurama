@@ -8,6 +8,7 @@ project("Futurama Domain Common Library")
 
 add_library(${FUTURAMA_DOMAIN_COMMON_TARGET_NAME}
     STATIC
+    "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/gamestarted.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/game.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/gamestate.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/meeting.h"

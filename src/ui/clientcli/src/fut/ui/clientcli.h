@@ -24,16 +24,20 @@ class ClientCli
     bool shouldStop;
 
     CommandParser commandParser;
-    infra::Subject commandSubject;
+    infra::Subject commandsSubject;
 
     StateHandler* activeStateHandler;
 
     void SetStateHandler(StateHandler* stateHandler);
 
+  public:
+    ClientCli(app::Client& client, std::istream& inputStream, std::ostream& outputStream);
+    ~ClientCli() noexcept;
+
     template<typename TStateHandler>
     void SetStateHandler()
     {
-        TStateHandler* stateHandler = new TStateHandler(*this, *client, commandSubject, *outputStream);
+        TStateHandler* stateHandler = new TStateHandler(*this, *client, commandsSubject, *outputStream);
 
         try
         {
@@ -46,10 +50,6 @@ class ClientCli
             throw;
         }
     }
-
-  public:
-    ClientCli(app::Client& client, std::istream& inputStream, std::ostream& outputStream);
-    ~ClientCli() noexcept;
 
     void Start();
     void Stop();

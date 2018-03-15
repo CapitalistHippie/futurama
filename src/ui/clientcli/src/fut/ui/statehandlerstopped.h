@@ -9,12 +9,14 @@ class StateHandlerStopped : public StateHandlerBase
 {
   private:
     void StartCommandHandler() const;
+    void GameStartedEventHandler() const;
+
+    void ExitStateBase() noexcept override;
 
   public:
     using StateHandlerBase::StateHandlerBase;
 
     void EnterState() override;
-    void ExitStateBase() noexcept override;
 }; // class StateHandlerStopped
 } // namespace fut::ui
 

@@ -167,11 +167,33 @@ class Subject
     template<typename TObservable, typename TObserver>
     ObserverHandle RegisterSimpleObserver(TObserver observer)
     {
-        auto observerObj = std::make_shared<detail::ObserverImpl<TObservable, TObserver>>(observer);
+        for (unsigned int i = 0; i < ObserverCount; ++i)
+        {
+            if (simpleObserversObservers[i] != nullptr)
+            {
+                continue;
+            }
 
-        observers.emplace(observerObj->id, observerObj);
+            auto observerObj = new detail::ObserverImpl<TObservable, TObserver>(observer);
 
-        return observerObj->id;
+            try
+            {
+                simpleObserversObservers[i] = observerObj;
+
+                return i;
+            }
+            catch (...)
+            {
+                if (observerObj == nullptr)
+                {
+                    delete observerObj;
+                }
+
+                throw;
+            }
+        }
+
+        throw std::system_error(std::make_error_code(FunctionalError::OutOfSpace));
     }
 
     void UnregisterPredicateObserver(ObserverHandle handle);
