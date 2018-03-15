@@ -30,11 +30,11 @@ void StateHandlerHeadquarters::PrintScan() const
 
     *outputStream << char(196) << char(196) << char(196);
 
-    for (unsigned int i = 0; i < scan.ColumnCount; ++i)
+    for (unsigned int i = 0; i < scan.RowCount; ++i)
     {
         *outputStream << "\n " << i << char(179);
 
-        for (unsigned int ii = 0; ii < scan.RowCount; ++ii)
+        for (unsigned int ii = 0; ii < scan.ColumnCount; ++ii)
         {
             const auto& sector = scan.sectors[ii][i];
 
