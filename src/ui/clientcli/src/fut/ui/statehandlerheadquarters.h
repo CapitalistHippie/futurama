@@ -10,6 +10,8 @@ class StateHandlerHeadquarters : public StateHandlerBase
   private:
     void ExitStateBase() noexcept override;
 
+    void PrintScan() const;
+
   public:
     using StateHandlerBase::StateHandlerBase;
 
