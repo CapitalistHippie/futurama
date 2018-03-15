@@ -8,6 +8,7 @@ project("Futurama Infra Common Library")
 
 add_library(${FUTURAMA_INFRA_COMMON_TARGET_NAME}
     STATIC
+    "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/clihelpers.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/concurrentautoincrement.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/functionalerror.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/functionalerrorcategory.h"

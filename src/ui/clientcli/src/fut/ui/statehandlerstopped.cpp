@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <fut/domain/events/gamestarted.h>
+#include <fut/infra/clihelpers.h>
 
 #include "fut/ui/statehandlerheadquarters.h"
 
@@ -28,6 +29,7 @@ void StateHandlerStopped::EnterState()
 
     RegisterEventObserver<domain::events::GameStarted>(std::bind(&StateHandlerStopped::GameStartedEventHandler, this));
 
+    infra::ClearCli();
     *outputStream << "Welcome to Futurama: Planet Express!\n"
                   << "Enter 'start' to start the game.\n";
 }
