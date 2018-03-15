@@ -41,13 +41,11 @@ void StateHandlerHeadquarters::PrintScan() const
             *outputStream << sector.asteroids << sector.meetings << sector.planets << ' ';
         }
 
-        if (i != scan.ColumnCount - 1)
+        if (i != scan.RowCount - 1)
         {
             *outputStream << "\n  " << char(179);
         }
     }
-
-    *outputStream << "\n\n";
 }
 
 void StateHandlerHeadquarters::EnterState()
@@ -56,4 +54,10 @@ void StateHandlerHeadquarters::EnterState()
     *outputStream << "You're in the headquarters. Pick a sector from the scan to start in.\n\n";
 
     PrintScan();
+
+    *outputStream << "\n\n";
+
+    *outputStream << "Available commands.\n"
+                  << "sector <column> <row>\t-- Go to this sector.\n"
+                  << "quit/exit/stop\t\t-- Quit the game.\n\n";
 }

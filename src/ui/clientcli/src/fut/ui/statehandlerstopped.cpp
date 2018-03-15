@@ -30,6 +30,9 @@ void StateHandlerStopped::EnterState()
     RegisterEventObserver<domain::events::GameStarted>(std::bind(&StateHandlerStopped::GameStartedEventHandler, this));
 
     infra::ClearCli();
-    *outputStream << "Welcome to Futurama: Planet Express!\n"
-                  << "Enter 'start' to start the game.\n";
+    *outputStream << "Welcome to Futurama: Planet Express!\n\n";
+
+    *outputStream << "Available commands.\n"
+                  << "start\t\t\t-- Start the game.\n"
+                  << "quit/exit/stop\t\t-- Quit the game.\n\n";
 }
