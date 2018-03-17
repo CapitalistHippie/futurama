@@ -1,6 +1,7 @@
 #ifndef FUTURAMA_FUT_APP_CLIENT_H_INCLUDED
 #define FUTURAMA_FUT_APP_CLIENT_H_INCLUDED
 
+#include <fut/infra/point.h>
 #include <fut/infra/randomnumbergenerator.h>
 #include <fut/infra/subject.h>
 
@@ -24,7 +25,11 @@ class Client
     const Game& GetGame() const;
     infra::Subject& GetGameEventsSubject();
 
-    void MoveToSector(unsigned int column, unsigned int row);
+    void MoveToSector(const infra::Point& sectorPoint);
+    void MoveUp();
+    void MoveRight();
+    void MoveDown();
+    void MoveLeft();
 }; // class Client
 } // namespace fut::app
 

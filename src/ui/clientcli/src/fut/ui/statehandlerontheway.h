@@ -11,9 +11,12 @@ class StateHandlerOnTheWay : public StateHandlerBase
   private:
     void ExitStateBase() noexcept override;
 
+    void MoveCommandHandler(const Command& command) const;
     void MovedToSectorGameEventHandler() const;
+    void MovedToFieldGameEventHandler() const;
+    void MovedToHeadquartersGameEventHandler() const;
 
-    void PrintCli(const char* extra) const;
+    void PrintCli(const char* extra = nullptr) const;
     void PrintSector() const;
 
   public:

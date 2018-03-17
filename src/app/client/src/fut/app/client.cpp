@@ -23,7 +23,27 @@ infra::Subject& Client::GetGameEventsSubject()
     return game.eventsSubject;
 }
 
-void Client::MoveToSector(unsigned int column, unsigned int row)
+void Client::MoveToSector(const infra::Point& sectorPoint)
 {
-    game.MoveToSector(column, row);
+    game.MoveToSector(sectorPoint);
+}
+
+void Client::MoveUp()
+{
+    game.MoveUp();
+}
+
+void Client::MoveRight()
+{
+    game.MoveRight();
+}
+
+void Client::MoveDown()
+{
+    game.MoveDown();
+}
+
+void Client::MoveLeft()
+{
+    game.MoveLeft();
 }

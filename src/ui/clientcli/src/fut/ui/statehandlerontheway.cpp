@@ -2,8 +2,12 @@
 
 #include <functional>
 
+#include <fut/domain/events/movedtofield.h>
+#include <fut/domain/events/movedtoheadquarters.h>
 #include <fut/domain/events/movedtosector.h>
 #include <fut/infra/clihelpers.h>
+
+#include "fut/ui/statehandlerheadquarters.h"
 
 using namespace fut::ui;
 
@@ -11,11 +15,53 @@ void StateHandlerOnTheWay::ExitStateBase() noexcept
 {
 }
 
-void StateHandlerOnTheWay::MovedToSectorGameEventHandler() const
+void fut::ui::StateHandlerOnTheWay::MoveCommandHandler(const Command& command) const
 {
+    if (command.argumentCount < 1)
+    {
+        PrintCli("Too few arguments.");
+        return;
+    }
+
+    if (strcmp(command.arguments[0], "up") == 0)
+    {
+        client->MoveUp();
+    }
+    else if (strcmp(command.arguments[0], "right") == 0)
+    {
+        client->MoveRight();
+    }
+    else if (strcmp(command.arguments[0], "down") == 0)
+    {
+        client->MoveDown();
+    }
+    else if (strcmp(command.arguments[0], "left") == 0)
+    {
+        client->MoveLeft();
+    }
+    else
+    {
+        PrintCli("Invalid direction.");
+        return;
+    }
 }
 
-void StateHandlerOnTheWay::PrintCli(const char* extra = nullptr) const
+void StateHandlerOnTheWay::MovedToSectorGameEventHandler() const
+{
+    PrintCli();
+}
+
+void StateHandlerOnTheWay::MovedToFieldGameEventHandler() const
+{
+    PrintCli();
+}
+
+void StateHandlerOnTheWay::MovedToHeadquartersGameEventHandler() const
+{
+    context->SetStateHandler<StateHandlerHeadquarters>();
+}
+
+void StateHandlerOnTheWay::PrintCli(const char* extra) const
 {
     infra::ClearCli();
     *outputStream << "You're on the route route to deliver your package. Navigate to the planet you need to deliver "
@@ -50,14 +96,14 @@ void StateHandlerOnTheWay::PrintSector() const
 
         for (unsigned int ii = 0; ii < sector.ColumnCount; ++ii)
         {
-            if (ship.currentSectorRow == i && ship.currentSectorColumn == ii)
+            if (ship.fieldPoint.y == i && ship.fieldPoint.x == ii)
             {
                 *outputStream << "P ";
 
                 continue;
             }
 
-            const auto& field = sector.fields[i][ii];
+            const auto& field = sector.fields[ii][i];
 
             switch (field.thing)
             {
@@ -85,8 +131,16 @@ void StateHandlerOnTheWay::PrintSector() const
 
 void StateHandlerOnTheWay::EnterState()
 {
+    RegisterCommandObserver("move", std::bind(&StateHandlerOnTheWay::MoveCommandHandler, this, std::placeholders::_1));
+
     RegisterGameEventObserver<domain::events::MovedToSector>(
       std::bind(&StateHandlerOnTheWay::MovedToSectorGameEventHandler, this));
+
+    RegisterGameEventObserver<domain::events::MovedToField>(
+      std::bind(&StateHandlerOnTheWay::MovedToFieldGameEventHandler, this));
+
+    RegisterGameEventObserver<domain::events::MovedToHeadquarters>(
+      std::bind(&StateHandlerOnTheWay::MovedToHeadquartersGameEventHandler, this));
 
     PrintCli();
 }

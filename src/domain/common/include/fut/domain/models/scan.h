@@ -7,8 +7,8 @@ namespace fut::domain::models
 {
 struct Scan
 {
-    static const unsigned int ColumnCount = 5;
-    static const unsigned int RowCount = 5;
+    static const int ColumnCount = 5;
+    static const int RowCount = 5;
 
     ScanSector sectors[ColumnCount][RowCount];
 }; // struct Scan

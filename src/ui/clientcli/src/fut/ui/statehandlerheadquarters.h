@@ -14,7 +14,7 @@ class StateHandlerHeadquarters : public StateHandlerBase
     void SectorCommandHandler(const Command& command) const;
     void MovedToSectorGameEventHandler() const;
 
-    void PrintCli(const char* extra) const;
+    void PrintCli(const char* extra = nullptr) const;
     void PrintScan() const;
 
   public:

@@ -1,14 +1,15 @@
 #ifndef FUTURAMA_FUT_DOMAIN_EVENTS_MOVEDTOSECTOR_H_INCLUDED
 #define FUTURAMA_FUT_DOMAIN_EVENTS_MOVEDTOSECTOR_H_INCLUDED
 
+#include <fut/infra/point.h>
+
 #include "fut/domain/models/sector.h"
 
 namespace fut::domain::events
 {
 struct MovedToSector
 {
-    unsigned int scanColumn = 0;
-    unsigned int scanRow = 0;
+    infra::Point sectorPoint;
 
     const models::Sector* sector = nullptr;
 }; // struct MovedToSector

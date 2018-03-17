@@ -9,6 +9,7 @@ project("Futurama Domain Common Library")
 add_library(${FUTURAMA_DOMAIN_COMMON_TARGET_NAME}
     STATIC
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/gamestarted.h"
+    "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/movedtofield.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/movedtoheadquarters.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/movedtosector.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/game.h"
@@ -27,3 +28,6 @@ add_library(${FUTURAMA_DOMAIN_COMMON_TARGET_NAME}
 
 target_include_directories(${FUTURAMA_DOMAIN_COMMON_TARGET_NAME}
     PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
+
+target_link_libraries(${FUTURAMA_DOMAIN_COMMON_TARGET_NAME}
+    "futurama-infra-common")

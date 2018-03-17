@@ -4,6 +4,7 @@
 
 #include <fut/domain/events/movedtosector.h>
 #include <fut/infra/clihelpers.h>
+#include <fut/infra/point.h>
 
 #include "fut/ui/statehandlerontheway.h"
 
@@ -23,42 +24,44 @@ void fut::ui::StateHandlerHeadquarters::SectorCommandHandler(const Command& comm
 
     char* endptr;
 
-    auto column = strtol(command.arguments[0], &endptr, 10);
+    infra::Point sectorPoint;
+
+    sectorPoint.x = strtol(command.arguments[0], &endptr, 10);
     if (endptr == command.arguments[0])
     {
         PrintCli("Invalid column index.");
         return;
     }
 
-    if (column < 0 || column > domain::models::Scan::ColumnCount - 1)
+    if (sectorPoint.x < 0 || sectorPoint.x > domain::models::Scan::ColumnCount - 1)
     {
         PrintCli("Column index out of range.");
         return;
     }
 
-    auto row = strtol(command.arguments[1], &endptr, 10);
+    sectorPoint.y = strtol(command.arguments[1], &endptr, 10);
     if (endptr == command.arguments[1])
     {
         PrintCli("Invalid row index.");
         return;
     }
 
-    if (row < 0 || row > domain::models::Scan::RowCount - 1)
+    if (sectorPoint.y < 0 || sectorPoint.y > domain::models::Scan::RowCount - 1)
     {
         PrintCli("Row index out of range.");
         return;
     }
 
-    if (column != 0 && column != domain::models::Scan::ColumnCount - 1)
+    if (sectorPoint.x != 0 && sectorPoint.x != domain::models::Scan::ColumnCount - 1)
     {
-        if (row != 0 && row != domain::models::Scan::RowCount - 1)
+        if (sectorPoint.y != 0 && sectorPoint.y != domain::models::Scan::RowCount - 1)
         {
             PrintCli("You can only start in a sector on the edge of the scan.");
             return;
         }
     }
 
-    client->MoveToSector(column, row);
+    client->MoveToSector(sectorPoint);
 }
 
 void StateHandlerHeadquarters::MovedToSectorGameEventHandler() const
@@ -66,7 +69,7 @@ void StateHandlerHeadquarters::MovedToSectorGameEventHandler() const
     context->SetStateHandler<StateHandlerOnTheWay>();
 }
 
-void StateHandlerHeadquarters::PrintCli(const char* extra = nullptr) const
+void StateHandlerHeadquarters::PrintCli(const char* extra) const
 {
     infra::ClearCli();
     *outputStream << "You're in the headquarters. Pick a sector from the scan to start in.\n\n";
