@@ -9,6 +9,12 @@ Command CommandParser::ParseCommand(std::istream& inputStream) const
     char commandLine[256];
     inputStream.getline(commandLine, 256);
 
+    if (strcmp(commandLine, "") == 0)
+    {
+        command.name[0] = '\0';
+        return command;
+    }
+
     char* loc = strtok(commandLine, " \n");
 
     strcpy(command.name, loc);
