@@ -20,12 +20,16 @@ class Game
     ScanGenerator scanGenerator;
     SectorGenerator sectorGenerator;
 
+    unsigned int currentScanColumn;
+    unsigned int currentScanRow;
+
   public:
     infra::Subject eventsSubject;
 
     Game(infra::RandomNumberGenerator& randomNumberGenerator);
 
     const domain::models::Game& GetData() const noexcept;
+    const domain::models::Sector& GetCurrentSector() const;
 
     void MoveToHeadQuarters();
     void MoveToSector(unsigned int column, unsigned int row);

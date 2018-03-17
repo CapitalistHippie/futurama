@@ -36,12 +36,6 @@ void fut::ui::StateHandlerHeadquarters::SectorCommandHandler(const Command& comm
         return;
     }
 
-    if (column != 0 && column != domain::models::Scan::ColumnCount - 1)
-    {
-        PrintCli("You can only start in a sector on the edge of the scan.");
-        return;
-    }
-
     auto row = strtol(command.arguments[1], &endptr, 10);
     if (endptr == command.arguments[1])
     {
@@ -55,10 +49,13 @@ void fut::ui::StateHandlerHeadquarters::SectorCommandHandler(const Command& comm
         return;
     }
 
-    if (row != 0 && row != domain::models::Scan::RowCount - 1)
+    if (column != 0 && column != domain::models::Scan::ColumnCount - 1)
     {
-        PrintCli("You can only start in a sector on the edge of the scan.");
-        return;
+        if (row != 0 && row != domain::models::Scan::RowCount - 1)
+        {
+            PrintCli("You can only start in a sector on the edge of the scan.");
+            return;
+        }
     }
 
     client->MoveToSector(column, row);

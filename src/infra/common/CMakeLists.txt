@@ -12,6 +12,7 @@ add_library(${FUTURAMA_INFRA_COMMON_TARGET_NAME}
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/concurrentautoincrement.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/functionalerror.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/functionalerrorcategory.h"
+    "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/point.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/randomnumbergenerator.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/subject.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/technicalerror.h"

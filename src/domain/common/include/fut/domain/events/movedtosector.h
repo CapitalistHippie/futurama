@@ -7,8 +7,8 @@ namespace fut::domain::events
 {
 struct MovedToSector
 {
-    unsigned int sectorColumn = 0;
-    unsigned int sectorRow = 0;
+    unsigned int scanColumn = 0;
+    unsigned int scanRow = 0;
 
     const models::Sector* sector = nullptr;
 }; // struct MovedToSector

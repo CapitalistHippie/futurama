@@ -19,14 +19,18 @@ void StateHandlerOnTheWay::PrintCli(const char* extra = nullptr) const
 {
     infra::ClearCli();
     *outputStream << "You're on the route route to deliver your package. Navigate to the planet you need to deliver "
-                     "your package on.\n\n";
+                     "your package to.\n\n";
 
     PrintSector();
 
     *outputStream << "\n\n";
 
     *outputStream << "Available commands.\n"
-                  << "sector <column> <row>\t-- Go to this sector.\n"
+                  << "move <direction>\t-- Move to the field up, right, down or left of you.\n"
+                  << "pickup\t\t\t-- Pickup a package from the planet next to you.\n"
+                  << "examine\t\t\t-- Examine the package.\n"
+                  << "deliver\t\t\t-- Deliver the package to the planet next to you.\n"
+                  << "nothing\t\t\t-- Do nothing.\n"
                   << "quit/exit/stop\t\t-- Quit the game.\n\n";
 
     if (extra != nullptr)
@@ -37,40 +41,46 @@ void StateHandlerOnTheWay::PrintCli(const char* extra = nullptr) const
 
 void StateHandlerOnTheWay::PrintSector() const
 {
-    const auto& sector = client->GetGame().GetData().universe.scan;
+    const auto& sector = client->GetGame().GetCurrentSector();
+    const auto& ship = client->GetGame().GetData().ship;
 
-    /**outputStream << "   ";
-
-    for (unsigned int i = 0; i < scan.ColumnCount; ++i)
+    for (unsigned int i = 0; i < sector.RowCount; ++i)
     {
-        *outputStream << ' ' << i << "  ";
-    }
+        *outputStream << ' ';
 
-    *outputStream << "\n  " << char(218);
-
-    for (unsigned int i = 0; i < scan.ColumnCount - 1; ++i)
-    {
-        *outputStream << char(196) << char(196) << char(196) << char(196);
-    }
-
-    *outputStream << char(196) << char(196) << char(196);
-
-    for (unsigned int i = 0; i < scan.RowCount; ++i)
-    {
-        *outputStream << "\n " << i << char(179);
-
-        for (unsigned int ii = 0; ii < scan.ColumnCount; ++ii)
+        for (unsigned int ii = 0; ii < sector.ColumnCount; ++ii)
         {
-            const auto& sector = scan.sectors[ii][i];
+            if (ship.currentSectorRow == i && ship.currentSectorColumn == ii)
+            {
+                *outputStream << "P ";
 
-            *outputStream << sector.asteroids << sector.meetings << sector.planets << ' ';
+                continue;
+            }
+
+            const auto& field = sector.fields[i][ii];
+
+            switch (field.thing)
+            {
+                case domain::models::SectorFieldThing::Empty:
+                    *outputStream << char(250) << ' ';
+                    break;
+                case domain::models::SectorFieldThing::Asteroid:
+                    *outputStream << "O ";
+                    break;
+                case domain::models::SectorFieldThing::Meeting:
+                    *outputStream << "* ";
+                    break;
+                case domain::models::SectorFieldThing::Planet:
+                    *outputStream << "@ ";
+                    break;
+            }
         }
 
-        if (i != scan.RowCount - 1)
+        if (i != sector.RowCount - 1)
         {
-            *outputStream << "\n  " << char(179);
+            *outputStream << '\n';
         }
-    }*/
+    }
 }
 
 void StateHandlerOnTheWay::EnterState()
