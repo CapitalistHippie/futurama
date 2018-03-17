@@ -9,6 +9,8 @@ project("Futurama App Client Library")
 add_library(${FUTURAMA_APP_CLIENT_TARGET_NAME}
     STATIC
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/app/client.h"
+    "${CMAKE_CURRENT_LIST_DIR}/include/fut/app/errorcode.h"
+    "${CMAKE_CURRENT_LIST_DIR}/include/fut/app/futuramaappexception.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/app/game.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/app/gamemanager.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/app/scangenerator.h"

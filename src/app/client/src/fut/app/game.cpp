@@ -8,6 +8,9 @@
 #include <fut/domain/models/gamestate.h>
 #include <fut/infra/point.h>
 
+#include "fut/app/errorcode.h"
+#include "fut/app/futuramaappexception.h"
+
 using namespace fut;
 using namespace fut::app;
 
@@ -38,6 +41,11 @@ void Game::MoveToHeadQuarters()
 void Game::MoveToSector(const infra::Point& sectorPoint, const infra::Point& fieldPoint)
 {
     const auto& sector = GetOrGenerateSector(sectorPoint);
+
+    if (sector.fields[fieldPoint.x][fieldPoint.y].thing != domain::models::SectorFieldThing::Empty)
+    {
+        throw FuturamaAppException(ErrorCode::FieldTaken);
+    }
 
     data.gameState = domain::models::GameState::OnTheWay;
     data.ship.sectorPoint = sectorPoint;
@@ -75,11 +83,11 @@ void Game::MoveToField(const infra::Point& fieldPoint)
     }
 
     // Check if the field isn't taken by something else.
-    auto currentSector = GetCurrentSector();
+    const auto& currentSector = GetCurrentSector();
 
     if (currentSector.fields[fieldPoint.x][fieldPoint.y].thing != domain::models::SectorFieldThing::Empty)
     {
-        throw std::exception("Can not move to a field that isn't empty.");
+        throw FuturamaAppException(ErrorCode::FieldTaken);
     }
 
     // MoveToField to the point.

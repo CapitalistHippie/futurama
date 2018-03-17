@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include <fut/app/errorcode.h>
+#include <fut/app/futuramaappexception.h>
 #include <fut/domain/events/movedtofield.h>
 #include <fut/domain/events/movedtoheadquarters.h>
 #include <fut/domain/events/movedtosector.h>
@@ -23,26 +25,39 @@ void fut::ui::StateHandlerOnTheWay::MoveCommandHandler(const Command& command) c
         return;
     }
 
-    if (strcmp(command.arguments[0], "up") == 0)
+    try
     {
-        client->MoveUp();
+        if (strcmp(command.arguments[0], "up") == 0)
+        {
+            client->MoveUp();
+        }
+        else if (strcmp(command.arguments[0], "right") == 0)
+        {
+            client->MoveRight();
+        }
+        else if (strcmp(command.arguments[0], "down") == 0)
+        {
+            client->MoveDown();
+        }
+        else if (strcmp(command.arguments[0], "left") == 0)
+        {
+            client->MoveLeft();
+        }
+        else
+        {
+            PrintCli("Invalid direction.");
+            return;
+        }
     }
-    else if (strcmp(command.arguments[0], "right") == 0)
+    catch (app::FuturamaAppException exception)
     {
-        client->MoveRight();
-    }
-    else if (strcmp(command.arguments[0], "down") == 0)
-    {
-        client->MoveDown();
-    }
-    else if (strcmp(command.arguments[0], "left") == 0)
-    {
-        client->MoveLeft();
-    }
-    else
-    {
-        PrintCli("Invalid direction.");
-        return;
+        if (exception.errorCode == app::ErrorCode::FieldTaken)
+        {
+            PrintCli("The field you're moving to is already taken by something else.");
+            return;
+        }
+
+        throw;
     }
 }
 
