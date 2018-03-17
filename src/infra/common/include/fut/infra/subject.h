@@ -1,12 +1,10 @@
 #ifndef FUTURAMA_FUT_INFRA_SUBJECT_H_INCLUDED
 #define FUTURAMA_FUT_INFRA_SUBJECT_H_INCLUDED
 
-#include <system_error>
+#include <exception>
 #include <typeindex>
 
 #include "fut/infra/concurrentautoincrement.h"
-#include "fut/infra/functionalerror.h"
-#include "fut/infra/functionalerrorcategory.h"
 
 namespace fut::infra
 {
@@ -161,7 +159,7 @@ class Subject
             }
         }
 
-        throw std::system_error(std::make_error_code(FunctionalError::OutOfSpace));
+        throw std::exception("No more space for predicate observers.");
     }
 
     template<typename TObservable, typename TObserver>
@@ -193,7 +191,7 @@ class Subject
             }
         }
 
-        throw std::system_error(std::make_error_code(FunctionalError::OutOfSpace));
+        throw std::exception("No more space for simple observers.");
     }
 
     void UnregisterPredicateObserver(ObserverHandle handle);
