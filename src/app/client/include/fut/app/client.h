@@ -1,34 +1,30 @@
 #ifndef FUTURAMA_FUT_APP_CLIENT_H_INCLUDED
 #define FUTURAMA_FUT_APP_CLIENT_H_INCLUDED
 
-#include <fut/domain/models/game.h>
 #include <fut/infra/randomnumbergenerator.h>
 #include <fut/infra/subject.h>
 
-#include "fut/app/scangenerator.h"
+#include "fut/app/game.h"
+#include "fut/app/gamemanager.h"
 
 namespace fut::app
 {
 class Client
 {
   private:
-    domain::models::Game game;
+    infra::RandomNumberGenerator* randomNumberGenerator;
 
-    ScanGenerator scanGenerator;
-
-    bool isGameRunning;
+    Game game;
 
   public:
     infra::Subject eventsSubject;
 
     Client(infra::RandomNumberGenerator& randomNumberGenerator);
 
-    void StartGame();
-    void StopGame();
+    const Game& GetGame() const;
+    infra::Subject& GetGameEventsSubject();
 
-    bool IsGameRunning() const;
-
-    const domain::models::Game& GetGame() const;
+    void MoveToSector(unsigned int column, unsigned int row);
 }; // class Client
 } // namespace fut::app
 

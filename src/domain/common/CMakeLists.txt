@@ -9,6 +9,8 @@ project("Futurama Domain Common Library")
 add_library(${FUTURAMA_DOMAIN_COMMON_TARGET_NAME}
     STATIC
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/gamestarted.h"
+    "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/movedtoheadquarters.h"
+    "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/movedtosector.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/game.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/gamestate.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/meeting.h"
@@ -18,7 +20,7 @@ add_library(${FUTURAMA_DOMAIN_COMMON_TARGET_NAME}
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/scansector.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/sector.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/sectorfield.h"
-    "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/sectorthing.h"
+    "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/sectorfieldthing.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/ship.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/universe.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/placeholder.cpp")

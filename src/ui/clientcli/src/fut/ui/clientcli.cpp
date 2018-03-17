@@ -4,7 +4,7 @@
 #include <system_error>
 
 #include "fut/ui/command.h"
-#include "fut/ui/statehandlerstopped.h"
+#include "fut/ui/statehandlermenu.h"
 
 using namespace fut;
 using namespace fut::ui;
@@ -61,8 +61,7 @@ void ClientCli::Start()
     commandsSubject.RegisterPredicateObserver<Command>(
       [](const Command& command) { return strcmp(command.name, "stop") == 0; }, stopCommandHandler);
 
-    // TODO: Set starting state handler based on current client and game state.
-    SetStateHandler<StateHandlerStopped>();
+    SetStateHandler<StateHandlerMenu>();
 
     do
     {

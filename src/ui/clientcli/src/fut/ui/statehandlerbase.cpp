@@ -8,7 +8,7 @@ StateHandlerBase::StateHandlerBase(ClientCli& context,
                                    infra::Subject& commandsSubject,
                                    std::ostream& outputStream)
   : commandObserverHandlesIndex(0)
-  , eventObserverHandlesIndex(0)
+  , gameEventObserverHandlesIndex(0)
   , context(&context)
   , client(&client)
   , commandsSubject(&commandsSubject)
@@ -23,9 +23,9 @@ void StateHandlerBase::ExitState() noexcept
         commandsSubject->UnregisterPredicateObserver(commandObserverHandles[i]);
     }
 
-    for (unsigned int i = 0; i < eventObserverHandlesIndex; ++i)
+    for (unsigned int i = 0; i < gameEventObserverHandlesIndex; ++i)
     {
-        client->eventsSubject.UnregisterSimpleObserver(eventObserverHandles[i]);
+        client->GetGameEventsSubject().UnregisterSimpleObserver(gameEventObserverHandles[i]);
     }
 
     ExitStateBase();

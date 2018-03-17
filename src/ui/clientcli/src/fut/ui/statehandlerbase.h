@@ -21,8 +21,8 @@ class StateHandlerBase : public StateHandler
     infra::Subject::ObserverHandle commandObserverHandles[infra::Subject::ObserverCount];
     unsigned int commandObserverHandlesIndex;
 
-    infra::Subject::ObserverHandle eventObserverHandles[infra::Subject::ObserverCount];
-    unsigned int eventObserverHandlesIndex;
+    infra::Subject::ObserverHandle gameEventObserverHandles[infra::Subject::ObserverCount];
+    unsigned int gameEventObserverHandlesIndex;
 
   protected:
     ClientCli* context;
@@ -41,12 +41,12 @@ class StateHandlerBase : public StateHandler
     }
 
     template<typename TObservable, typename TObserver>
-    void RegisterEventObserver(TObserver&& observer)
+    void RegisterGameEventObserver(TObserver&& observer)
     {
         auto observerHandle =
-          client->eventsSubject.RegisterSimpleObserver<TObservable>(std::forward<TObserver>(observer));
+          client->GetGameEventsSubject().RegisterSimpleObserver<TObservable>(std::forward<TObserver>(observer));
 
-        eventObserverHandles[eventObserverHandlesIndex++] = observerHandle;
+        gameEventObserverHandles[gameEventObserverHandlesIndex++] = observerHandle;
     }
 
   public:

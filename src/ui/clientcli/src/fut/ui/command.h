@@ -6,6 +6,9 @@ namespace fut::ui
 struct Command
 {
     char name[64];
+
+    unsigned int argumentCount = 0;
+    char arguments[64][64];
 }; // struct Command
 } // namespace fut::ui
 

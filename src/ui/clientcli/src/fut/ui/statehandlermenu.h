@@ -5,19 +5,20 @@
 
 namespace fut::ui
 {
-class StateHandlerStopped : public StateHandlerBase
+class StateHandlerMenu : public StateHandlerBase
 {
   private:
-    void StartCommandHandler() const;
-    void GameStartedEventHandler() const;
-
     void ExitStateBase() noexcept override;
+
+    void StartCommandHandler() const;
+
+    void PrintCli() const;
 
   public:
     using StateHandlerBase::StateHandlerBase;
 
     void EnterState() override;
-}; // class StateHandlerStopped
+}; // class StateHandlerMenu
 } // namespace fut::ui
 
 #endif // FUTURAMA_FUT_UI_STATEHANDLERSTOPPED_H_INCLUDED

@@ -6,19 +6,16 @@ Command CommandParser::ParseCommand(std::istream& inputStream) const
 {
     Command command;
 
-    char commandLine[64];
-    inputStream.getline(commandLine, 64);
+    char commandLine[256];
+    inputStream.getline(commandLine, 256);
 
-    char* locationPtr = strchr(commandLine, ' ');
-    if (locationPtr == nullptr)
+    char* loc = strtok(commandLine, " \n");
+
+    strcpy(command.name, loc);
+
+    for (loc = strtok(nullptr, " \n"); loc != nullptr; loc = strtok(nullptr, " \n"))
     {
-        strcpy(command.name, commandLine);
-    }
-    else
-    {
-        int location = locationPtr - commandLine + 1;
-        strncpy(command.name, commandLine, location - 1);
-        command.name[location - 1] = '\0';
+        strcpy(command.arguments[command.argumentCount++], loc);
     }
 
     return command;
