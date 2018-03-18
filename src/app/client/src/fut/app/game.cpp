@@ -42,7 +42,7 @@ void Game::MoveToSector(const infra::Point& sectorPoint, const infra::Point& fie
 {
     const auto& sector = GetOrGenerateSector(sectorPoint);
 
-    if (sector.fields[fieldPoint.x][fieldPoint.y].thing != domain::models::SectorFieldThing::Empty)
+    if (sector.columns[fieldPoint.x][fieldPoint.y].thing != domain::models::SectorFieldThing::Empty)
     {
         throw FuturamaAppException(ErrorCode::FieldTaken);
     }
@@ -85,7 +85,7 @@ void Game::MoveToField(const infra::Point& fieldPoint)
     // Check if the field isn't taken by something else.
     const auto& currentSector = GetCurrentSector();
 
-    if (currentSector.fields[fieldPoint.x][fieldPoint.y].thing != domain::models::SectorFieldThing::Empty)
+    if (currentSector.columns[fieldPoint.x][fieldPoint.y].thing != domain::models::SectorFieldThing::Empty)
     {
         throw FuturamaAppException(ErrorCode::FieldTaken);
     }
@@ -148,6 +148,67 @@ infra::Point fut::app::Game::GetRelativeSectorFieldPoint(const infra::Point& fie
     return sectorFieldPoint;
 }
 
+void Game::GetFieldsAroundPoint(infra::Point fieldPoint,
+                                const domain::models::SectorField** fieldsBuffer,
+                                unsigned int& fieldCountBuffer) const
+{
+    fieldCountBuffer = 0;
+
+    fieldPoint.x -= 1;
+    fieldPoint.y -= 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.x += 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.x += 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.y += 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.y += 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.x -= 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.x -= 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.y -= 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+}
+
+const domain::models::SectorField& Game::GetField(const infra::Point& fieldPoint) const
+{
+    return data.universe.sectors[data.ship.sectorPoint.x][data.ship.sectorPoint.y]->columns[fieldPoint.x][fieldPoint.y];
+}
+
 bool Game::IsPointOutsideUniverse(const infra::Point& fieldPoint) const
 {
     if (fieldPoint.x < 0 && data.ship.sectorPoint.x == 0)
@@ -165,6 +226,17 @@ bool Game::IsPointOutsideUniverse(const infra::Point& fieldPoint) const
     }
     else if (fieldPoint.y >= domain::models::Sector::RowCount &&
              data.ship.sectorPoint.y == domain::models::Scan::RowCount - 1)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool Game::IsPointOutsideSector(const infra::Point& fieldPoint) const
+{
+    if (fieldPoint.x < 0 || fieldPoint.x >= domain::models::Sector::ColumnCount || fieldPoint.y < 0 ||
+        fieldPoint.y >= domain::models::Sector::RowCount)
     {
         return true;
     }
@@ -206,8 +278,9 @@ domain::models::Sector& Game::GetOrGenerateSector(const infra::Point& sectorPoin
     }
 }
 
-Game::Game(infra::RandomNumberGenerator& randomNumberGenerator)
+Game::Game(infra::RandomNumberGenerator& randomNumberGenerator, dal::PackageRepository& packageRepository)
   : randomNumberGenerator(&randomNumberGenerator)
+  , packageRepository(&packageRepository)
   , scanGenerator(randomNumberGenerator)
   , sectorGenerator(randomNumberGenerator)
 {
@@ -229,29 +302,64 @@ const domain::models::Sector& fut::app::Game::GetCurrentSector() const
     return *data.universe.sectors[data.ship.sectorPoint.x][data.ship.sectorPoint.y];
 }
 
+bool Game::CanPickupPackage() const
+{
+    if (HavePackage())
+    {
+        return false;
+    }
+
+    const domain::models::SectorField* fieldsBuffer[8];
+    unsigned int fieldCountBuffer;
+
+    GetFieldsAroundPoint(data.ship.fieldPoint, fieldsBuffer, fieldCountBuffer);
+
+    for (unsigned int i = 0; i < fieldCountBuffer; ++i)
+    {
+        const domain::models::SectorField& field = *fieldsBuffer[i];
+
+        if (field.thing == domain::models::SectorFieldThing::Planet)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Game::HavePackage() const
+{
+    return data.ship.package != nullptr;
+}
+
 void Game::MoveToSector(const infra::Point& sectorPoint)
 {
+    if (data.gameState != domain::models::GameState::Headquarters)
+    {
+        throw std::exception("Moving to a specific sector is only allowed while in headquarters.");
+    }
+
     if (sectorPoint.x != 0 && sectorPoint.x != domain::models::Scan::ColumnCount - 1)
     {
         if (sectorPoint.y != 0 && sectorPoint.y != domain::models::Scan::RowCount - 1)
         {
-            throw std::exception("Can only move to a sector on the edge of the scan.");
+            throw std::exception("Can only move to a sector on the edge of the universe.");
         }
     }
 
     domain::models::Sector& sector = GetOrGenerateSector(sectorPoint);
 
     // Pick a spot to put the ship.
-    constexpr auto fieldCount = domain::models::Sector::ColumnCount * domain::models::Sector::RowCount;
+    constexpr auto columnCount = domain::models::Sector::ColumnCount * domain::models::Sector::RowCount;
 
     unsigned int potentialSpotCount = 0;
-    infra::Point potentialSpots[fieldCount];
+    infra::Point potentialSpots[columnCount];
 
     for (unsigned int i = 0; i < domain::models::Sector::ColumnCount; ++i)
     {
         for (unsigned int ii = 0; ii < domain::models::Sector::RowCount; ++ii)
         {
-            if (sector.fields[i][ii].thing != domain::models::SectorFieldThing::Empty)
+            if (sector.columns[i][ii].thing != domain::models::SectorFieldThing::Empty)
             {
                 continue;
             }
@@ -296,4 +404,17 @@ void Game::MoveLeft()
     fieldPoint.x -= 1;
 
     MoveToField(fieldPoint);
+}
+
+void Game::PickupPackage()
+{
+    if (HavePackage())
+    {
+        throw std::exception("Can not pick up a package while there is an active package to deliver.");
+    }
+
+    const domain::models::SectorField* fieldsBuffer[8];
+    unsigned int fieldCountBuffer;
+
+    GetFieldsAroundPoint(data.ship.fieldPoint, fieldsBuffer, fieldCountBuffer);
 }

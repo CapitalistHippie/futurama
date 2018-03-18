@@ -10,10 +10,12 @@ add_library(${FUTURAMA_INFRA_COMMON_TARGET_NAME}
     STATIC
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/clihelpers.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/concurrentautoincrement.h"
+    "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/csvparser.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/futuramaexception.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/point.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/randomnumbergenerator.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/infra/subject.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/fut/infra/csvparser.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/fut/infra/randomnumbergenerator.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/fut/infra/subject.cpp")
 

@@ -3,6 +3,8 @@
 
 #include <fut/infra/point.h>
 
+#include "fut/domain/models/package.h"
+
 namespace fut::domain::models
 {
 struct Ship
@@ -10,6 +12,15 @@ struct Ship
     unsigned int damagePoints = 0;
     infra::Point sectorPoint;
     infra::Point fieldPoint;
+    Package* package = nullptr;
+
+    ~Ship()
+    {
+        if (package != nullptr)
+        {
+            delete package;
+        }
+    }
 }; // struct Ship
 } // namespace fut::domain::models
 

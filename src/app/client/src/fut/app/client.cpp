@@ -9,7 +9,8 @@ using namespace fut::app;
 
 Client::Client(infra::RandomNumberGenerator& randomNumberGenerator)
   : randomNumberGenerator(&randomNumberGenerator)
-  , game(randomNumberGenerator)
+  , packageRepository("D:/Projects/futurama/repo/assets/packages.csv")
+  , game(randomNumberGenerator, packageRepository)
 {
 }
 
@@ -46,4 +47,9 @@ void Client::MoveDown()
 void Client::MoveLeft()
 {
     game.MoveLeft();
+}
+
+void Client::PickupPackage()
+{
+    game.PickupPackage();
 }

@@ -61,6 +61,17 @@ void fut::ui::StateHandlerOnTheWay::MoveCommandHandler(const Command& command) c
     }
 }
 
+void StateHandlerOnTheWay::PickupCommandHandler() const
+{
+    if (!client->GetGame().CanPickupPackage())
+    {
+        PrintCli("You can not pick up a package right now.");
+        return;
+    }
+
+    client->PickupPackage();
+}
+
 void StateHandlerOnTheWay::MovedToSectorGameEventHandler() const
 {
     PrintCli();
@@ -118,7 +129,7 @@ void StateHandlerOnTheWay::PrintSector() const
                 continue;
             }
 
-            const auto& field = sector.fields[ii][i];
+            const auto& field = sector.columns[ii][i];
 
             switch (field.thing)
             {
@@ -147,6 +158,7 @@ void StateHandlerOnTheWay::PrintSector() const
 void StateHandlerOnTheWay::EnterState()
 {
     RegisterCommandObserver("move", std::bind(&StateHandlerOnTheWay::MoveCommandHandler, this, std::placeholders::_1));
+    RegisterCommandObserver("pickup", std::bind(&StateHandlerOnTheWay::PickupCommandHandler, this));
 
     RegisterGameEventObserver<domain::events::MovedToSector>(
       std::bind(&StateHandlerOnTheWay::MovedToSectorGameEventHandler, this));

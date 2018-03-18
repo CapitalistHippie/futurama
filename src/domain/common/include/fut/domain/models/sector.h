@@ -10,7 +10,7 @@ struct Sector
     static const int ColumnCount = 10;
     static const int RowCount = 10;
 
-    SectorField fields[ColumnCount][RowCount];
+    SectorField columns[ColumnCount][RowCount];
 }; // struct Sector
 } // namespace fut::domain::models
 

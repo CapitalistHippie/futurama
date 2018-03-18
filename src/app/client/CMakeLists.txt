@@ -26,4 +26,5 @@ target_include_directories(${FUTURAMA_APP_CLIENT_TARGET_NAME}
 
 target_link_libraries(${FUTURAMA_APP_CLIENT_TARGET_NAME}
     "futurama-domain-common"
+    "futurama-dal-common"
     "futurama-infra-common")

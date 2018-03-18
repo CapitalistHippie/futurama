@@ -1,6 +1,7 @@
 #ifndef FUTURAMA_FUT_APP_CLIENT_H_INCLUDED
 #define FUTURAMA_FUT_APP_CLIENT_H_INCLUDED
 
+#include <fut/dal/packagefilerepository.h>
 #include <fut/infra/point.h>
 #include <fut/infra/randomnumbergenerator.h>
 #include <fut/infra/subject.h>
@@ -14,6 +15,7 @@ class Client
 {
   private:
     infra::RandomNumberGenerator* randomNumberGenerator;
+    dal::PackageFileRepository packageRepository;
 
     Game game;
 
@@ -30,6 +32,7 @@ class Client
     void MoveRight();
     void MoveDown();
     void MoveLeft();
+    void PickupPackage();
 }; // class Client
 } // namespace fut::app
 

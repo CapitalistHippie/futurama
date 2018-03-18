@@ -12,6 +12,7 @@ class StateHandlerOnTheWay : public StateHandlerBase
     void ExitStateBase() noexcept override;
 
     void MoveCommandHandler(const Command& command) const;
+    void PickupCommandHandler() const;
     void MovedToSectorGameEventHandler() const;
     void MovedToFieldGameEventHandler() const;
     void MovedToHeadquartersGameEventHandler() const;

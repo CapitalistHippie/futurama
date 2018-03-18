@@ -12,16 +12,16 @@ domain::models::Sector SectorGenerator::GenerateSector(const domain::models::Sca
 {
     domain::models::Sector sector;
 
-    constexpr auto fieldCount = domain::models::Sector::ColumnCount * domain::models::Sector::RowCount;
+    constexpr auto columnCount = domain::models::Sector::ColumnCount * domain::models::Sector::RowCount;
 
     unsigned int sectorFieldThingsIndex = 0;
-    domain::models::SectorFieldThing* sectorFieldThings[fieldCount];
+    domain::models::SectorFieldThing* sectorFieldThings[columnCount];
 
     for (unsigned int i = 0; i < domain::models::Sector::ColumnCount; ++i)
     {
         for (unsigned int ii = 0; ii < domain::models::Sector::RowCount; ++ii)
         {
-            sectorFieldThings[sectorFieldThingsIndex++] = &sector.fields[i][ii].thing;
+            sectorFieldThings[sectorFieldThingsIndex++] = &sector.columns[i][ii].thing;
         }
     }
 
@@ -29,33 +29,33 @@ domain::models::Sector SectorGenerator::GenerateSector(const domain::models::Sca
 
     for (unsigned int i = 0; i < scanSector.asteroids; ++i)
     {
-        auto index = randomNumberGenerator->GenerateBetweenInclusive(0, fieldCount - usedFieldsCount - 1);
+        auto index = randomNumberGenerator->GenerateBetweenInclusive(0, columnCount - usedFieldsCount - 1);
 
         *sectorFieldThings[index] = domain::models::SectorFieldThing::Asteroid;
 
-        sectorFieldThings[index] = sectorFieldThings[fieldCount - usedFieldsCount - 1];
+        sectorFieldThings[index] = sectorFieldThings[columnCount - usedFieldsCount - 1];
 
         usedFieldsCount++;
     }
 
     for (unsigned int i = 0; i < scanSector.meetings; ++i)
     {
-        auto index = randomNumberGenerator->GenerateBetweenInclusive(0, fieldCount - usedFieldsCount - 1);
+        auto index = randomNumberGenerator->GenerateBetweenInclusive(0, columnCount - usedFieldsCount - 1);
 
         *sectorFieldThings[index] = domain::models::SectorFieldThing::Meeting;
 
-        sectorFieldThings[index] = sectorFieldThings[fieldCount - usedFieldsCount - 1];
+        sectorFieldThings[index] = sectorFieldThings[columnCount - usedFieldsCount - 1];
 
         usedFieldsCount++;
     }
 
     for (unsigned int i = 0; i < scanSector.planets; ++i)
     {
-        auto index = randomNumberGenerator->GenerateBetweenInclusive(0, fieldCount - usedFieldsCount - 1);
+        auto index = randomNumberGenerator->GenerateBetweenInclusive(0, columnCount - usedFieldsCount - 1);
 
         *sectorFieldThings[index] = domain::models::SectorFieldThing::Planet;
 
-        sectorFieldThings[index] = sectorFieldThings[fieldCount - usedFieldsCount - 1];
+        sectorFieldThings[index] = sectorFieldThings[columnCount - usedFieldsCount - 1];
 
         usedFieldsCount++;
     }
