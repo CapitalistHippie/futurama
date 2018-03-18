@@ -417,4 +417,6 @@ void Game::PickupPackage()
     unsigned int fieldCountBuffer;
 
     GetFieldsAroundPoint(data.ship.fieldPoint, fieldsBuffer, fieldCountBuffer);
+
+    auto package = packageRepository->GetRandomPackage();
 }

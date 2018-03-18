@@ -10,7 +10,6 @@
 #include <iostream>
 
 #include <fut/app/client.h>
-#include <fut/infra/randomnumbergenerator.h>
 
 #include "fut/ui/clientcli.h"
 
@@ -29,9 +28,7 @@ int main()
     try
     {
 #endif // #ifdef NDEBUG
-        fut::infra::RandomNumberGenerator randomNumberGenerator;
-
-        fut::app::Client client(randomNumberGenerator);
+        fut::app::Client client;
 
         ClientCli clientCli(client, std::cin, std::cout);
         clientCli.Start();

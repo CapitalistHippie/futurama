@@ -14,7 +14,7 @@ namespace fut::app
 class Client
 {
   private:
-    infra::RandomNumberGenerator* randomNumberGenerator;
+    infra::RandomNumberGenerator randomNumberGenerator;
     dal::PackageFileRepository packageRepository;
 
     Game game;
@@ -22,7 +22,7 @@ class Client
   public:
     infra::Subject eventsSubject;
 
-    Client(infra::RandomNumberGenerator& randomNumberGenerator);
+    Client();
 
     const Game& GetGame() const;
     infra::Subject& GetGameEventsSubject();

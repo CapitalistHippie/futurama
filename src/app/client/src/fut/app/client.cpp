@@ -7,11 +7,11 @@
 using namespace fut;
 using namespace fut::app;
 
-Client::Client(infra::RandomNumberGenerator& randomNumberGenerator)
-  : randomNumberGenerator(&randomNumberGenerator)
-  , packageRepository("D:/Projects/futurama/repo/assets/packages.csv")
+Client::Client()
+  : packageRepository(randomNumberGenerator)
   , game(randomNumberGenerator, packageRepository)
 {
+    packageRepository.ReadPackagesFromCsv("D:/Projects/futurama/repo/assets/packages.csv");
 }
 
 const Game& Client::GetGame() const

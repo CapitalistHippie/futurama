@@ -3,8 +3,13 @@
 using namespace fut;
 using namespace fut::dal;
 
-PackageFileRepository::PackageFileRepository(const char* filePath)
-  : packageCount(0)
+PackageFileRepository::PackageFileRepository(infra::RandomNumberGenerator& randomNumberGenerator)
+  : randomNumberGenerator(&randomNumberGenerator)
+  , packageCount(0)
+{
+}
+
+void fut::dal::PackageFileRepository::ReadPackagesFromCsv(const char* filePath)
 {
     infra::CsvParser parser;
     parser.OpenFile(filePath);
@@ -20,5 +25,5 @@ PackageFileRepository::PackageFileRepository(const char* filePath)
 
 domain::models::Package PackageFileRepository::GetRandomPackage() const
 {
-    return domain::models::Package();
+    return packages[randomNumberGenerator->GenerateBetweenInclusive(0, packageCount - 1)];
 }
