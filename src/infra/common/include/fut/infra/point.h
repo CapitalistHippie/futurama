@@ -8,6 +8,15 @@ struct Point
     int x = 0;
     int y = 0;
 }; // struct Point
+
+inline bool IsPointNextToPoint(const Point& left, const Point& right)
+{
+    Point point = left;
+    point.x -= right.x;
+    point.y -= right.y;
+
+    return point.x < 1 && point.x > -1 && point.y < 1 && point.y > -1;
+}
 } // namespace fut::infra
 
 inline bool operator==(const fut::infra::Point& left, const fut::infra::Point& right)

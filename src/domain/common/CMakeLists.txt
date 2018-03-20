@@ -12,6 +12,7 @@ add_library(${FUTURAMA_DOMAIN_COMMON_TARGET_NAME}
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/movedtofield.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/movedtoheadquarters.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/movedtosector.h"
+    "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/events/packagepickedup.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/game.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/gamestate.h"
     "${CMAKE_CURRENT_LIST_DIR}/include/fut/domain/models/meeting.h"

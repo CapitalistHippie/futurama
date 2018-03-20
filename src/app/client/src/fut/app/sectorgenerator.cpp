@@ -21,7 +21,7 @@ domain::models::Sector SectorGenerator::GenerateSector(const domain::models::Sca
     {
         for (unsigned int ii = 0; ii < domain::models::Sector::RowCount; ++ii)
         {
-            sectorFieldThings[sectorFieldThingsIndex++] = &sector.columns[i][ii].thing;
+            sectorFieldThings[sectorFieldThingsIndex++] = &sector.fields[i][ii].thing;
         }
     }
 

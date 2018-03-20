@@ -33,6 +33,8 @@ class Client
     void MoveDown();
     void MoveLeft();
     void PickupPackage();
+    void DeliverPackage();
+    void SkipTurn();
 }; // class Client
 } // namespace fut::app
 

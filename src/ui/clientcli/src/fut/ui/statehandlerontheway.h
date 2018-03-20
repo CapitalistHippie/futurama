@@ -13,12 +13,19 @@ class StateHandlerOnTheWay : public StateHandlerBase
 
     void MoveCommandHandler(const Command& command) const;
     void PickupCommandHandler() const;
+    void ExamineCommandHandler() const;
+    void DeliverCommandHandler() const;
+    void SkipCommandHandler() const;
+
     void MovedToSectorGameEventHandler() const;
     void MovedToFieldGameEventHandler() const;
     void MovedToHeadquartersGameEventHandler() const;
+    void PackagePickedUpGameEventHandler() const;
 
+    void PrintCliWithPackageInfo() const;
     void PrintCli(const char* extra = nullptr) const;
     void PrintSector() const;
+    void PrintPackageInfo() const;
 
   public:
     using StateHandlerBase::StateHandlerBase;

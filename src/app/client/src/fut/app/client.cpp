@@ -53,3 +53,13 @@ void Client::PickupPackage()
 {
     game.PickupPackage();
 }
+
+void Client::DeliverPackage()
+{
+    game.DeliverPackage();
+}
+
+void Client::SkipTurn()
+{
+    game.SkipTurn();
+}

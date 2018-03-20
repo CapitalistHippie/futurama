@@ -33,11 +33,17 @@ class Game
     void GetFieldsAroundPoint(infra::Point fieldPoint,
                               const domain::models::SectorField** fieldsBuffer,
                               unsigned int& fieldCountBuffer) const;
+    void GetScanSectorsAroundPoint(infra::Point sectorPoint,
+                                   const domain::models::ScanSector** scanSectorsBuffer,
+                                   unsigned int& scanSectorCountBuffer) const;
     const domain::models::SectorField& GetField(const infra::Point& fieldPoint) const;
+    const domain::models::ScanSector& GetScanSector(const infra::Point& sectorPoint) const;
     bool IsPointOutsideUniverse(const infra::Point& fieldPoint) const;
     bool IsPointOutsideSector(const infra::Point& fieldPoint) const;
 
     domain::models::Sector& GetOrGenerateSector(const infra::Point& sectorPoint);
+    domain::models::Package GeneratePackage();
+    void RemovePackage();
 
   public:
     infra::Subject eventsSubject;
@@ -47,6 +53,7 @@ class Game
     const domain::models::Game& GetData() const noexcept;
     const domain::models::Sector& GetCurrentSector() const;
     bool CanPickupPackage() const;
+    bool IsShipNextToThing(domain::models::SectorFieldThing thing) const;
     bool HavePackage() const;
 
     void MoveToSector(const infra::Point& sectorPoint);
@@ -55,6 +62,8 @@ class Game
     void MoveDown();
     void MoveLeft();
     void PickupPackage();
+    void DeliverPackage();
+    void SkipTurn();
 }; // class Game
 } // namespace fut::app
 

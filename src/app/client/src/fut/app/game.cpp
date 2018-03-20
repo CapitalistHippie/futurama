@@ -1,10 +1,12 @@
 #include "fut/app/game.h"
 
+#include <algorithm>
 #include <exception>
 
 #include <fut/domain/events/movedtofield.h>
 #include <fut/domain/events/movedtoheadquarters.h>
 #include <fut/domain/events/movedtosector.h>
+#include <fut/domain/events/packagepickedup.h>
 #include <fut/domain/models/gamestate.h>
 #include <fut/infra/point.h>
 
@@ -33,6 +35,8 @@ void Game::MoveToHeadQuarters()
     data.ship.damagePoints = 0;
     data.gameState = domain::models::GameState::Headquarters;
 
+    RemovePackage();
+
     // Throw event.
     domain::events::MovedToHeadquarters movedToHeadquartersEvent;
     eventsSubject.NotifyObservers(movedToHeadquartersEvent);
@@ -42,7 +46,7 @@ void Game::MoveToSector(const infra::Point& sectorPoint, const infra::Point& fie
 {
     const auto& sector = GetOrGenerateSector(sectorPoint);
 
-    if (sector.columns[fieldPoint.x][fieldPoint.y].thing != domain::models::SectorFieldThing::Empty)
+    if (sector.fields[fieldPoint.x][fieldPoint.y].thing != domain::models::SectorFieldThing::Empty)
     {
         throw FuturamaAppException(ErrorCode::FieldTaken);
     }
@@ -85,7 +89,7 @@ void Game::MoveToField(const infra::Point& fieldPoint)
     // Check if the field isn't taken by something else.
     const auto& currentSector = GetCurrentSector();
 
-    if (currentSector.columns[fieldPoint.x][fieldPoint.y].thing != domain::models::SectorFieldThing::Empty)
+    if (currentSector.fields[fieldPoint.x][fieldPoint.y].thing != domain::models::SectorFieldThing::Empty)
     {
         throw FuturamaAppException(ErrorCode::FieldTaken);
     }
@@ -204,9 +208,70 @@ void Game::GetFieldsAroundPoint(infra::Point fieldPoint,
     }
 }
 
+void fut::app::Game::GetScanSectorsAroundPoint(infra::Point sectorPoint,
+                                               const domain::models::ScanSector** scanSectorsBuffer,
+                                               unsigned int& scanSectorCountBuffer) const
+{
+    scanSectorCountBuffer = 0;
+
+    sectorPoint.x -= 1;
+    sectorPoint.y -= 1;
+    if (!IsPointOutsideUniverse(sectorPoint))
+    {
+        scanSectorsBuffer[scanSectorCountBuffer++] = &GetScanSector(sectorPoint);
+    }
+
+    sectorPoint.x += 1;
+    if (!IsPointOutsideUniverse(sectorPoint))
+    {
+        scanSectorsBuffer[scanSectorCountBuffer++] = &GetScanSector(sectorPoint);
+    }
+
+    sectorPoint.x += 1;
+    if (!IsPointOutsideUniverse(sectorPoint))
+    {
+        scanSectorsBuffer[scanSectorCountBuffer++] = &GetScanSector(sectorPoint);
+    }
+
+    sectorPoint.y += 1;
+    if (!IsPointOutsideUniverse(sectorPoint))
+    {
+        scanSectorsBuffer[scanSectorCountBuffer++] = &GetScanSector(sectorPoint);
+    }
+
+    sectorPoint.y += 1;
+    if (!IsPointOutsideUniverse(sectorPoint))
+    {
+        scanSectorsBuffer[scanSectorCountBuffer++] = &GetScanSector(sectorPoint);
+    }
+
+    sectorPoint.x -= 1;
+    if (!IsPointOutsideUniverse(sectorPoint))
+    {
+        scanSectorsBuffer[scanSectorCountBuffer++] = &GetScanSector(sectorPoint);
+    }
+
+    sectorPoint.x -= 1;
+    if (!IsPointOutsideUniverse(sectorPoint))
+    {
+        scanSectorsBuffer[scanSectorCountBuffer++] = &GetScanSector(sectorPoint);
+    }
+
+    sectorPoint.y -= 1;
+    if (!IsPointOutsideUniverse(sectorPoint))
+    {
+        scanSectorsBuffer[scanSectorCountBuffer++] = &GetScanSector(sectorPoint);
+    }
+}
+
 const domain::models::SectorField& Game::GetField(const infra::Point& fieldPoint) const
 {
-    return data.universe.sectors[data.ship.sectorPoint.x][data.ship.sectorPoint.y]->columns[fieldPoint.x][fieldPoint.y];
+    return data.universe.sectors[data.ship.sectorPoint.x][data.ship.sectorPoint.y]->fields[fieldPoint.x][fieldPoint.y];
+}
+
+const domain::models::ScanSector& Game::GetScanSector(const infra::Point& sectorPoint) const
+{
+    return data.universe.scan.sectors[sectorPoint.x][sectorPoint.y];
 }
 
 bool Game::IsPointOutsideUniverse(const infra::Point& fieldPoint) const
@@ -278,6 +343,88 @@ domain::models::Sector& Game::GetOrGenerateSector(const infra::Point& sectorPoin
     }
 }
 
+domain::models::Package fut::app::Game::GeneratePackage()
+{
+    // Get a random package from the repository.
+    auto package = packageRepository->GetRandomPackage();
+
+    // Find an eligible planet to deliver the package to (must be at least two sectors away).
+    const domain::models::ScanSector* scanSectorsBuffer[8];
+    unsigned int scanSectorCountBuffer;
+
+    GetScanSectorsAroundPoint(data.ship.sectorPoint, scanSectorsBuffer, scanSectorCountBuffer);
+
+    constexpr auto sectorCount = domain::models::Scan::ColumnCount * domain::models::Scan::RowCount;
+
+    unsigned int eligibleScanSectorCount = 0;
+    infra::Point eligibleScanSectorPoints[sectorCount];
+
+    for (unsigned int i = 0; i < domain::models::Scan::ColumnCount; ++i)
+    {
+        for (unsigned int ii = 0; ii < domain::models::Scan::RowCount; ++ii)
+        {
+            // Check if it's eligible.
+            if (std::any_of(scanSectorsBuffer,
+                            scanSectorsBuffer + 8,
+                            [&](const domain::models::ScanSector* scanSector) {
+                                return scanSector == &data.universe.scan.sectors[i][ii];
+                            }) ||
+                data.universe.scan.sectors[i][ii].planets == 0)
+            {
+                continue;
+            }
+
+            eligibleScanSectorPoints[eligibleScanSectorCount].x = i;
+            eligibleScanSectorPoints[eligibleScanSectorCount++].y = ii;
+        }
+    }
+
+    if (eligibleScanSectorCount == 0)
+    {
+        throw std::exception("No eligible planets found to deliver a package to.");
+    }
+
+    const auto& sectorPoint =
+      eligibleScanSectorPoints[randomNumberGenerator->GenerateBetweenInclusive(0, eligibleScanSectorCount - 1)];
+
+    package.destinationSectorPoint = sectorPoint;
+
+    const auto& sector = GetOrGenerateSector(sectorPoint);
+
+    auto planetIndex = randomNumberGenerator->GenerateBetweenInclusive(
+      1, data.universe.scan.sectors[sectorPoint.x][sectorPoint.y].planets);
+
+    for (unsigned int i = 0; i < domain::models::Sector::ColumnCount; ++i)
+    {
+        for (unsigned int ii = 0; ii < domain::models::Sector::RowCount; ++ii)
+        {
+            if (sector.fields[i][ii].thing == domain::models::SectorFieldThing::Planet)
+            {
+                if (--planetIndex != 0)
+                {
+                    continue;
+                }
+
+                package.destinationFieldPoint.x = i;
+                package.destinationFieldPoint.y = ii;
+            }
+        }
+    }
+
+    return package;
+}
+
+void Game::RemovePackage()
+{
+    if (!HavePackage())
+    {
+        return;
+    }
+
+    delete data.ship.package;
+    data.ship.package = nullptr;
+}
+
 Game::Game(infra::RandomNumberGenerator& randomNumberGenerator, dal::PackageRepository& packageRepository)
   : randomNumberGenerator(&randomNumberGenerator)
   , packageRepository(&packageRepository)
@@ -309,22 +456,67 @@ bool Game::CanPickupPackage() const
         return false;
     }
 
+    // Check if there's a planet around the player to pickup a package from.
+    if (!IsShipNextToThing(domain::models::SectorFieldThing::Planet))
+    {
+        return false;
+    }
+
+    // Check if there's an eligible planet to deliver the package to (must be at least two sectors away).
+    const domain::models::ScanSector* scanSectorsBuffer[8];
+    unsigned int scanSectorCountBuffer;
+
+    GetScanSectorsAroundPoint(data.ship.sectorPoint, scanSectorsBuffer, scanSectorCountBuffer);
+
+    unsigned int eligibleScanSectorCount = 0;
+
+    for (unsigned int i = 0; i < domain::models::Scan::ColumnCount; ++i)
+    {
+        for (unsigned int ii = 0; ii < domain::models::Scan::RowCount; ++ii)
+        {
+            // Check if it's eligible.
+            if (std::any_of(scanSectorsBuffer,
+                            scanSectorsBuffer + 8,
+                            [&](const domain::models::ScanSector* scanSector) {
+                                return scanSector == &data.universe.scan.sectors[i][ii];
+                            }) ||
+                data.universe.scan.sectors[i][ii].planets == 0)
+            {
+                continue;
+            }
+
+            eligibleScanSectorCount++;
+        }
+    }
+
+    if (eligibleScanSectorCount == 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool Game::IsShipNextToThing(domain::models::SectorFieldThing thing) const
+{
     const domain::models::SectorField* fieldsBuffer[8];
     unsigned int fieldCountBuffer;
 
     GetFieldsAroundPoint(data.ship.fieldPoint, fieldsBuffer, fieldCountBuffer);
 
+    unsigned int thingAroundPlayerCount = 0;
+
     for (unsigned int i = 0; i < fieldCountBuffer; ++i)
     {
         const domain::models::SectorField& field = *fieldsBuffer[i];
 
-        if (field.thing == domain::models::SectorFieldThing::Planet)
+        if (field.thing == thing)
         {
-            return true;
+            thingAroundPlayerCount++;
         }
     }
 
-    return false;
+    return thingAroundPlayerCount != 0;
 }
 
 bool Game::HavePackage() const
@@ -359,7 +551,7 @@ void Game::MoveToSector(const infra::Point& sectorPoint)
     {
         for (unsigned int ii = 0; ii < domain::models::Sector::RowCount; ++ii)
         {
-            if (sector.columns[i][ii].thing != domain::models::SectorFieldThing::Empty)
+            if (sector.fields[i][ii].thing != domain::models::SectorFieldThing::Empty)
             {
                 continue;
             }
@@ -413,10 +605,18 @@ void Game::PickupPackage()
         throw std::exception("Can not pick up a package while there is an active package to deliver.");
     }
 
-    const domain::models::SectorField* fieldsBuffer[8];
-    unsigned int fieldCountBuffer;
+    auto package = GeneratePackage();
+    data.ship.package = new domain::models::Package(std::move(package));
 
-    GetFieldsAroundPoint(data.ship.fieldPoint, fieldsBuffer, fieldCountBuffer);
+    // Throw event.
+    domain::events::PackagePickedUp packagePickedUpEvent;
+    eventsSubject.NotifyObservers(packagePickedUpEvent);
+}
 
-    auto package = packageRepository->GetRandomPackage();
+void Game::DeliverPackage()
+{
+}
+
+void Game::SkipTurn()
+{
 }

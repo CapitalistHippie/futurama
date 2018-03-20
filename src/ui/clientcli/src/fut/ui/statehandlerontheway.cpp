@@ -7,6 +7,7 @@
 #include <fut/domain/events/movedtofield.h>
 #include <fut/domain/events/movedtoheadquarters.h>
 #include <fut/domain/events/movedtosector.h>
+#include <fut/domain/events/packagepickedup.h>
 #include <fut/infra/clihelpers.h>
 
 #include "fut/ui/statehandlerheadquarters.h"
@@ -63,6 +64,18 @@ void fut::ui::StateHandlerOnTheWay::MoveCommandHandler(const Command& command) c
 
 void StateHandlerOnTheWay::PickupCommandHandler() const
 {
+    if (client->GetGame().HavePackage())
+    {
+        PrintCli("You already have a package.");
+        return;
+    }
+
+    if (!client->GetGame().IsShipNextToThing(domain::models::SectorFieldThing::Planet))
+    {
+        PrintCli("You have to be next to a planet to pickup a package.");
+        return;
+    }
+
     if (!client->GetGame().CanPickupPackage())
     {
         PrintCli("You can not pick up a package right now.");
@@ -70,6 +83,37 @@ void StateHandlerOnTheWay::PickupCommandHandler() const
     }
 
     client->PickupPackage();
+}
+
+void StateHandlerOnTheWay::ExamineCommandHandler() const
+{
+    if (!client->GetGame().HavePackage())
+    {
+        PrintCli("You don't have a package.");
+    }
+
+    PrintCliWithPackageInfo();
+}
+
+void StateHandlerOnTheWay::DeliverCommandHandler() const
+{
+    if (!client->GetGame().HavePackage())
+    {
+        PrintCli("You don't have a package.");
+    }
+
+    if (!client->GetGame().IsShipNextToThing(domain::models::SectorFieldThing::Planet))
+    {
+        PrintCli("You have to be next to a planet to deliver a package.");
+        return;
+    }
+
+    client->DeliverPackage();
+}
+
+void StateHandlerOnTheWay::SkipCommandHandler() const
+{
+    client->SkipTurn();
 }
 
 void StateHandlerOnTheWay::MovedToSectorGameEventHandler() const
@@ -87,6 +131,19 @@ void StateHandlerOnTheWay::MovedToHeadquartersGameEventHandler() const
     context->SetStateHandler<StateHandlerHeadquarters>();
 }
 
+void StateHandlerOnTheWay::PackagePickedUpGameEventHandler() const
+{
+    PrintCliWithPackageInfo();
+}
+
+void StateHandlerOnTheWay::PrintCliWithPackageInfo() const
+{
+    PrintCli();
+    PrintPackageInfo();
+
+    *outputStream << "\n\n";
+}
+
 void StateHandlerOnTheWay::PrintCli(const char* extra) const
 {
     infra::ClearCli();
@@ -100,9 +157,9 @@ void StateHandlerOnTheWay::PrintCli(const char* extra) const
     *outputStream << "Available commands.\n"
                   << "move <direction>\t-- Move to the field up, right, down or left of you.\n"
                   << "pickup\t\t\t-- Pickup a package from the planet next to you.\n"
-                  << "examine\t\t\t-- Examine the package.\n"
+                  << "examine\t\t\t-- Shows the package contents and destination.\n"
                   << "deliver\t\t\t-- Deliver the package to the planet next to you.\n"
-                  << "nothing\t\t\t-- Do nothing.\n"
+                  << "skip\t\t\t-- Skip this turn.\n"
                   << "quit/exit/stop\t\t-- Quit the game.\n\n";
 
     if (extra != nullptr)
@@ -129,7 +186,7 @@ void StateHandlerOnTheWay::PrintSector() const
                 continue;
             }
 
-            const auto& field = sector.columns[ii][i];
+            const auto& field = sector.fields[ii][i];
 
             switch (field.thing)
             {
@@ -155,10 +212,24 @@ void StateHandlerOnTheWay::PrintSector() const
     }
 }
 
+void fut::ui::StateHandlerOnTheWay::PrintPackageInfo() const
+{
+    const domain::models::Package& package = *client->GetGame().GetData().ship.package;
+
+    *outputStream << "Package contents description: " << package.contentsDescription << "\n";
+    *outputStream << "Package destination description: " << package.destinationDescription << "\n";
+    *outputStream << "Package destination: Sector (" << package.destinationSectorPoint.x << ','
+                  << package.destinationSectorPoint.y << ") - Planet (" << package.destinationFieldPoint.x << ','
+                  << package.destinationFieldPoint.y << ")";
+}
+
 void StateHandlerOnTheWay::EnterState()
 {
     RegisterCommandObserver("move", std::bind(&StateHandlerOnTheWay::MoveCommandHandler, this, std::placeholders::_1));
     RegisterCommandObserver("pickup", std::bind(&StateHandlerOnTheWay::PickupCommandHandler, this));
+    RegisterCommandObserver("examine", std::bind(&StateHandlerOnTheWay::ExamineCommandHandler, this));
+    RegisterCommandObserver("deliver", std::bind(&StateHandlerOnTheWay::DeliverCommandHandler, this));
+    RegisterCommandObserver("skip", std::bind(&StateHandlerOnTheWay::SkipCommandHandler, this));
 
     RegisterGameEventObserver<domain::events::MovedToSector>(
       std::bind(&StateHandlerOnTheWay::MovedToSectorGameEventHandler, this));
@@ -168,6 +239,9 @@ void StateHandlerOnTheWay::EnterState()
 
     RegisterGameEventObserver<domain::events::MovedToHeadquarters>(
       std::bind(&StateHandlerOnTheWay::MovedToHeadquartersGameEventHandler, this));
+
+    RegisterGameEventObserver<domain::events::PackagePickedUp>(
+      std::bind(&StateHandlerOnTheWay::PackagePickedUpGameEventHandler, this));
 
     PrintCli();
 }
