@@ -519,6 +519,19 @@ bool Game::IsShipNextToThing(domain::models::SectorFieldThing thing) const
     return thingAroundPlayerCount != 0;
 }
 
+bool Game::IsShipNextToPackageDestination() const
+{
+    if (!HavePackage())
+    {
+        throw std::exception("Player doesn't have a package.");
+    }
+
+    const domain::models::Ship& ship = data.ship;
+
+    return ship.sectorPoint == ship.package->destinationSectorPoint &&
+           infra::IsPointNextToPoint(ship.fieldPoint, ship.package->destinationFieldPoint);
+}
+
 bool Game::HavePackage() const
 {
     return data.ship.package != nullptr;

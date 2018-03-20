@@ -108,6 +108,12 @@ void StateHandlerOnTheWay::DeliverCommandHandler() const
         return;
     }
 
+    if (!client->GetGame().IsShipNextToPackageDestination())
+    {
+        PrintCli("You're at the wrong planet.");
+        return;
+    }
+
     client->DeliverPackage();
 }
 

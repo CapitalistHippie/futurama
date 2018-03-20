@@ -54,6 +54,7 @@ class Game
     const domain::models::Sector& GetCurrentSector() const;
     bool CanPickupPackage() const;
     bool IsShipNextToThing(domain::models::SectorFieldThing thing) const;
+    bool IsShipNextToPackageDestination() const;
     bool HavePackage() const;
 
     void MoveToSector(const infra::Point& sectorPoint);

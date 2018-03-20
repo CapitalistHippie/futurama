@@ -15,7 +15,7 @@ inline bool IsPointNextToPoint(const Point& left, const Point& right)
     point.x -= right.x;
     point.y -= right.y;
 
-    return point.x < 1 && point.x > -1 && point.y < 1 && point.y > -1;
+    return point.x <= 1 && point.x >= -1 && point.y <= 1 && point.y >= -1;
 }
 } // namespace fut::infra
 
