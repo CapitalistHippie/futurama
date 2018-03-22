@@ -7,6 +7,7 @@
 #include <fut/domain/events/movedtoheadquarters.h>
 #include <fut/domain/events/movedtosector.h>
 #include <fut/domain/events/packagepickedup.h>
+#include <fut/domain/events/victorypointschanged.h>
 #include <fut/domain/models/gamestate.h>
 #include <fut/infra/point.h>
 
@@ -425,6 +426,29 @@ void Game::RemovePackage()
     data.ship.package = nullptr;
 }
 
+void Game::ChangeVictoryPoints(int points)
+{
+    unsigned int oldPoints = data.player.victoryPoints;
+
+    data.player.victoryPoints += points;
+
+    if (data.player.victoryPoints < 0)
+    {
+        data.player.victoryPoints = 0;
+    }
+
+    if (oldPoints == data.player.victoryPoints)
+    {
+        return;
+    }
+
+    // Throw event.
+    domain::events::VictoryPointsChanged victoryPointsChangedEvent;
+    victoryPointsChangedEvent.oldPoints = oldPoints;
+    victoryPointsChangedEvent.newPoints = data.player.victoryPoints;
+    eventsSubject.NotifyObservers(victoryPointsChangedEvent);
+}
+
 Game::Game(infra::RandomNumberGenerator& randomNumberGenerator, dal::PackageRepository& packageRepository)
   : randomNumberGenerator(&randomNumberGenerator)
   , packageRepository(&packageRepository)
@@ -628,6 +652,14 @@ void Game::PickupPackage()
 
 void Game::DeliverPackage()
 {
+    if (!IsShipNextToPackageDestination())
+    {
+        throw std::exception("Player is not next to the package destination.");
+    }
+
+    ChangeVictoryPoints(1);
+
+    MoveToHeadQuarters();
 }
 
 void Game::SkipTurn()

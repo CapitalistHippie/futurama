@@ -78,6 +78,10 @@ void StateHandlerHeadquarters::PrintCli(const char* extra) const
 
     *outputStream << "\n\n";
 
+    *outputStream << "Victory points: " << client->GetGame().GetData().player.victoryPoints << '.';
+
+    *outputStream << "\n\n";
+
     *outputStream << "Available commands.\n"
                   << "sector <column> <row>\t-- Go to this sector.\n"
                   << "quit/exit/stop\t\t-- Quit the game.\n\n";

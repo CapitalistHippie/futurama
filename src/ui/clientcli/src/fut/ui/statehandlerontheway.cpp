@@ -160,6 +160,10 @@ void StateHandlerOnTheWay::PrintCli(const char* extra) const
 
     *outputStream << "\n\n";
 
+    *outputStream << "Victory points: " << client->GetGame().GetData().player.victoryPoints << '.';
+
+    *outputStream << "\n\n";
+
     *outputStream << "Available commands.\n"
                   << "move <direction>\t-- Move to the field up, right, down or left of you.\n"
                   << "pickup\t\t\t-- Pickup a package from the planet next to you.\n"

@@ -5,6 +5,7 @@ namespace fut::domain::models
 {
 struct Player
 {
+    unsigned int victoryPoints = 0;
 }; // struct Player
 } // namespace fut::domain::models
 
