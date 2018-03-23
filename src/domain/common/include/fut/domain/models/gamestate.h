@@ -6,7 +6,10 @@ namespace fut::domain::models
 enum class GameState
 {
     Headquarters,
-    OnTheWay
+    OnTheWay,
+    InMeeting,
+    Win,
+    Lose
 }; // enum class GameState
 } // namespace fut::domain::models
 

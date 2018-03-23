@@ -7,6 +7,7 @@
 #include <fut/domain/events/movedtoheadquarters.h>
 #include <fut/domain/events/movedtosector.h>
 #include <fut/domain/events/packagepickedup.h>
+#include <fut/domain/events/statechanged.h>
 #include <fut/domain/events/victorypointschanged.h>
 #include <fut/domain/models/gamestate.h>
 #include <fut/infra/point.h>
@@ -101,6 +102,16 @@ void Game::MoveToField(const infra::Point& fieldPoint)
     // Throw event.
     domain::events::MovedToField movedToFieldEvent;
     eventsSubject.NotifyObservers(movedToFieldEvent);
+}
+
+void fut::app::Game::EnterMeeting()
+{
+    if (data.gameState != domain::models::GameState::OnTheWay)
+    {
+        throw std::exception("Player can only move into a meeting while on the way.");
+    }
+
+    SetState(domain::models::GameState::InMeeting);
 }
 
 infra::Point fut::app::Game::GetRelativeSectorPoint(const infra::Point& fieldPoint) const
@@ -415,6 +426,11 @@ domain::models::Package fut::app::Game::GeneratePackage()
     return package;
 }
 
+domain::models::Meeting Game::GenerateMeeting()
+{
+    return domain::models::Meeting();
+}
+
 void Game::RemovePackage()
 {
     if (!HavePackage())
@@ -447,11 +463,103 @@ void Game::ChangeVictoryPoints(int points)
     victoryPointsChangedEvent.oldPoints = oldPoints;
     victoryPointsChangedEvent.newPoints = data.player.victoryPoints;
     eventsSubject.NotifyObservers(victoryPointsChangedEvent);
+
+    if (data.player.victoryPoints >= 10)
+    {
+        SetState(domain::models::GameState::Win);
+    }
 }
 
-Game::Game(infra::RandomNumberGenerator& randomNumberGenerator, dal::PackageRepository& packageRepository)
+void Game::EndTurn()
+{
+    // Check if last turn didn't change the state.
+    if (data.gameState != domain::models::GameState::OnTheWay)
+    {
+        return;
+    }
+
+    MoveMeetings();
+
+    if (IsShipNextToThing(domain::models::SectorFieldThing::Meeting))
+    {
+        EnterMeeting();
+    }
+}
+
+void Game::MoveMeetings()
+{
+    if (data.gameState != domain::models::GameState::OnTheWay)
+    {
+        throw std::exception("Can only move meetings while on the way.");
+    }
+
+    auto& sector = GetOrGenerateSector(data.ship.sectorPoint);
+    const auto& shipFieldPoint = data.ship.fieldPoint;
+
+    unsigned int meetingCount = 0;
+    infra::Point meetingFieldPoints[3];
+
+    for (int i = 0; i < domain::models::Sector::ColumnCount; ++i)
+    {
+        for (int ii = 0; ii < domain::models::Sector::RowCount; ++ii)
+        {
+            if (sector.fields[i][ii].thing == domain::models::SectorFieldThing::Meeting)
+            {
+                meetingFieldPoints[meetingCount++] = infra::Point(i, ii);
+            }
+        }
+    }
+
+    for (unsigned int i = 0; i < meetingCount; ++i)
+    {
+        if (infra::IsPointNextToPoint(meetingFieldPoints[i], shipFieldPoint))
+        {
+            continue;
+        }
+
+        auto x = meetingFieldPoints[i].x;
+        auto y = meetingFieldPoints[i].y;
+
+        if (x < data.ship.fieldPoint.x && sector.fields[x + 1][y].thing == domain::models::SectorFieldThing::Empty)
+        {
+            sector.fields[x + 1][y].thing = domain::models::SectorFieldThing::Meeting;
+            sector.fields[x][y].thing = domain::models::SectorFieldThing::Empty;
+        }
+        else if (x > data.ship.fieldPoint.x && sector.fields[x - 1][y].thing == domain::models::SectorFieldThing::Empty)
+        {
+            sector.fields[x - 1][y].thing = domain::models::SectorFieldThing::Meeting;
+            sector.fields[x][y].thing = domain::models::SectorFieldThing::Empty;
+        }
+        else if (y < data.ship.fieldPoint.y && sector.fields[x][y + 1].thing == domain::models::SectorFieldThing::Empty)
+        {
+            sector.fields[x][y + 1].thing = domain::models::SectorFieldThing::Meeting;
+            sector.fields[x][y].thing = domain::models::SectorFieldThing::Empty;
+        }
+        else if (y > data.ship.fieldPoint.y && sector.fields[x][y - 1].thing == domain::models::SectorFieldThing::Empty)
+        {
+            sector.fields[x][y - 1].thing = domain::models::SectorFieldThing::Meeting;
+            sector.fields[x][y].thing = domain::models::SectorFieldThing::Empty;
+        }
+    }
+}
+
+void Game::SetState(domain::models::GameState state)
+{
+    domain::events::StateChanged evt;
+    evt.oldState = data.gameState;
+    evt.newState = state;
+
+    data.gameState = state;
+
+    eventsSubject.NotifyObservers(evt);
+}
+
+Game::Game(infra::RandomNumberGenerator& randomNumberGenerator,
+           dal::PackageRepository& packageRepository,
+           dal::MeetingRepository& meetingRepository)
   : randomNumberGenerator(&randomNumberGenerator)
   , packageRepository(&packageRepository)
+  , meetingRepository(&meetingRepository)
   , scanGenerator(randomNumberGenerator)
   , sectorGenerator(randomNumberGenerator)
 {
@@ -609,6 +717,8 @@ void Game::MoveUp()
     fieldPoint.y -= 1;
 
     MoveToField(fieldPoint);
+
+    EndTurn();
 }
 
 void Game::MoveRight()
@@ -617,6 +727,8 @@ void Game::MoveRight()
     fieldPoint.x += 1;
 
     MoveToField(fieldPoint);
+
+    EndTurn();
 }
 
 void Game::MoveDown()
@@ -625,6 +737,8 @@ void Game::MoveDown()
     fieldPoint.y += 1;
 
     MoveToField(fieldPoint);
+
+    EndTurn();
 }
 
 void Game::MoveLeft()
@@ -633,6 +747,8 @@ void Game::MoveLeft()
     fieldPoint.x -= 1;
 
     MoveToField(fieldPoint);
+
+    EndTurn();
 }
 
 void Game::PickupPackage()
@@ -648,6 +764,8 @@ void Game::PickupPackage()
     // Throw event.
     domain::events::PackagePickedUp packagePickedUpEvent;
     eventsSubject.NotifyObservers(packagePickedUpEvent);
+
+    EndTurn();
 }
 
 void Game::DeliverPackage()
@@ -660,8 +778,11 @@ void Game::DeliverPackage()
     ChangeVictoryPoints(1);
 
     MoveToHeadQuarters();
+
+    EndTurn();
 }
 
 void Game::SkipTurn()
 {
+    EndTurn();
 }

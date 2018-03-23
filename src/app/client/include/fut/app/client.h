@@ -1,6 +1,7 @@
 #ifndef FUTURAMA_FUT_APP_CLIENT_H_INCLUDED
 #define FUTURAMA_FUT_APP_CLIENT_H_INCLUDED
 
+#include <fut/dal/meetingfilerepository.h>
 #include <fut/dal/packagefilerepository.h>
 #include <fut/infra/point.h>
 #include <fut/infra/randomnumbergenerator.h>
@@ -15,6 +16,7 @@ class Client
 {
   private:
     infra::RandomNumberGenerator randomNumberGenerator;
+    dal::MeetingFileRepository meetingRepository;
     dal::PackageFileRepository packageRepository;
 
     Game game;

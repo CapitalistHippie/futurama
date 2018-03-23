@@ -7,6 +7,16 @@ struct Point
 {
     int x = 0;
     int y = 0;
+
+    Point()
+    {
+    }
+
+    Point(int x, int y)
+      : x(x)
+      , y(y)
+    {
+    }
 }; // struct Point
 
 inline bool IsPointNextToPoint(const Point& left, const Point& right)
