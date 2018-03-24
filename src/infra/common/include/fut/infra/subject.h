@@ -107,7 +107,10 @@ class Subject
 
                 predicateObserversObservers[i]->Notify(&observable);
             }
+        }
 
+        for (unsigned int i = 0; i < ObserverCount; ++i)
+        {
             if (simpleObserversObservers[i] != nullptr)
             {
                 if (!simpleObserversObservers[i]->CanHandleType(typeid(TObservable)))
@@ -145,12 +148,12 @@ class Subject
             }
             catch (...)
             {
-                if (predicateObj == nullptr)
+                if (predicateObj != nullptr)
                 {
                     delete predicateObj;
                 }
 
-                if (observerObj == nullptr)
+                if (observerObj != nullptr)
                 {
                     delete observerObj;
                 }
@@ -182,7 +185,7 @@ class Subject
             }
             catch (...)
             {
-                if (observerObj == nullptr)
+                if (observerObj != nullptr)
                 {
                     delete observerObj;
                 }

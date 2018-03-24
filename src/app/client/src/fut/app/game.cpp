@@ -111,7 +111,7 @@ void fut::app::Game::EnterMeeting()
         throw std::exception("Player can only move into a meeting while on the way.");
     }
 
-    SetState(domain::models::GameState::InMeeting);
+    // SetState(domain::models::GameState::InMeeting);
 }
 
 infra::Point fut::app::Game::GetRelativeSectorPoint(const infra::Point& fieldPoint) const
@@ -669,6 +669,28 @@ bool Game::HavePackage() const
     return data.ship.package != nullptr;
 }
 
+void Game::Reset()
+{
+    // Reset the universe.
+    for (unsigned int i = 0; i < domain::models::Scan::ColumnCount; ++i)
+    {
+        for (unsigned int ii = 0; ii < domain::models::Scan::RowCount; ++ii)
+        {
+            if (data.universe.sectors[i][ii] != nullptr)
+            {
+                delete data.universe.sectors[i][ii];
+                data.universe.sectors[i][ii] = nullptr;
+            }
+        }
+    }
+
+    data.ship.damagePoints = 0;
+    data.player.victoryPoints = 0;
+    data.gameState = domain::models::GameState::Headquarters;
+
+    RemovePackage();
+}
+
 void Game::MoveToSector(const infra::Point& sectorPoint)
 {
     if (data.gameState != domain::models::GameState::Headquarters)
@@ -775,11 +797,9 @@ void Game::DeliverPackage()
         throw std::exception("Player is not next to the package destination.");
     }
 
-    ChangeVictoryPoints(1);
-
     MoveToHeadQuarters();
 
-    EndTurn();
+    ChangeVictoryPoints(1);
 }
 
 void Game::SkipTurn()

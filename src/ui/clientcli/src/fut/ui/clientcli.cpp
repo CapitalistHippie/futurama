@@ -3,7 +3,11 @@
 #include <functional>
 #include <system_error>
 
+#include <fut/domain/events/statechanged.h>
+#include <fut/domain/models/gamestate.h>
+
 #include "fut/ui/command.h"
+#include "fut/ui/statehandlergameend.h"
 #include "fut/ui/statehandlermenu.h"
 
 using namespace fut;
@@ -61,6 +65,12 @@ void ClientCli::Start()
     commandsSubject.RegisterPredicateObserver<Command>(
       [](const Command& command) { return strcmp(command.name, "stop") == 0; }, stopCommandHandler);
 
+    client->GetGameEventsSubject().RegisterPredicateObserver<domain::events::StateChanged>(
+      [](const domain::events::StateChanged& evt) {
+          return evt.newState == domain::models::GameState::Win || evt.newState == domain::models::GameState::Lose;
+      },
+      std::bind(&ClientCli::SetStateHandler<StateHandlerGameEnd>, this));
+
     SetStateHandler<StateHandlerMenu>();
 
     do
@@ -89,6 +99,7 @@ void ClientCli::Start()
 
     // Cleanup should be done here.
     commandsSubject.Clear();
+    client->GetGameEventsSubject().Clear();
 
     isRunning = false;
     shouldStop = false;

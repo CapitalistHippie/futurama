@@ -26,6 +26,7 @@ class Client
 
     Client();
 
+    void ResetGame();
     const Game& GetGame() const;
     infra::Subject& GetGameEventsSubject();
 

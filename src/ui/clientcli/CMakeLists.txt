@@ -15,6 +15,8 @@ add_executable(${FUTURAMA_UI_CLIENT_CLI_TARGET_NAME}
     "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandler.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlerbase.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlerbase.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlergameend.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlergameend.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlerheadquarters.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlerheadquarters.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlermenu.cpp"

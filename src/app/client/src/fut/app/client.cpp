@@ -16,6 +16,11 @@ Client::Client()
     packageRepository.ReadPackagesFromCsv("D:/Projects/futurama/repo/assets/packages.csv");
 }
 
+void Client::ResetGame()
+{
+    game.Reset();
+}
+
 const Game& Client::GetGame() const
 {
     return game;

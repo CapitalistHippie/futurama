@@ -68,6 +68,7 @@ class Game
     bool IsShipNextToPackageDestination() const;
     bool HavePackage() const;
 
+    void Reset();
     void MoveToSector(const infra::Point& sectorPoint);
     void MoveUp();
     void MoveRight();
