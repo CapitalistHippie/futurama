@@ -1,11 +1,11 @@
 #ifndef FUTURAMA_FUT_APP_GAME_H_INCLUDED
 #define FUTURAMA_FUT_APP_GAME_H_INCLUDED
 
-#include <fut/dal/meetingrepository.h>
+#include <fut/dal/encounterrepository.h>
 #include <fut/dal/packagerepository.h>
 #include <fut/domain/models/character.h>
+#include <fut/domain/models/encounter.h>
 #include <fut/domain/models/game.h>
-#include <fut/domain/models/meeting.h>
 #include <fut/infra/point.h>
 #include <fut/infra/randomnumbergenerator.h>
 #include <fut/infra/subject.h>
@@ -22,8 +22,8 @@ class Game
 
     infra::RandomNumberGenerator* randomNumberGenerator;
 
+    dal::EncounterRepository* encounterRepository;
     dal::PackageRepository* packageRepository;
-    dal::MeetingRepository* meetingRepository;
 
     ScanGenerator scanGenerator;
     SectorGenerator sectorGenerator;
@@ -31,7 +31,7 @@ class Game
     void MoveToHeadQuarters();
     void MoveToSector(const infra::Point& sectorPoint, const infra::Point& fieldPoint);
     void MoveToField(const infra::Point& fieldPoint);
-    void EnterMeeting();
+    void EnterEncounter();
 
     infra::Point GetRelativeSectorPoint(const infra::Point& fieldPoint) const;
     infra::Point GetRelativeSectorFieldPoint(const infra::Point& fieldPoint) const;
@@ -48,19 +48,19 @@ class Game
 
     domain::models::Sector& GetOrGenerateSector(const infra::Point& sectorPoint);
     domain::models::Package GeneratePackage();
+    void RemoveEncounter();
     void RemovePackage();
-    void RemoveMeeting();
     void ChangeVictoryPoints(int points);
     void EndTurn();
-    void MoveMeetings();
+    void MoveEncounters();
     void SetState(domain::models::GameState state);
 
   public:
     infra::Subject eventsSubject;
 
     Game(infra::RandomNumberGenerator& randomNumberGenerator,
-         dal::PackageRepository& packageRepository,
-         dal::MeetingRepository& meetingRepository);
+         dal::EncounterRepository& encounterRepository,
+         dal::PackageRepository& packageRepository);
 
     const domain::models::Game& GetData() const noexcept;
     const domain::models::Sector& GetCurrentSector() const;

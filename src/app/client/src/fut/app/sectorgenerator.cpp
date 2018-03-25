@@ -38,11 +38,11 @@ domain::models::Sector SectorGenerator::GenerateSector(const domain::models::Sca
         usedFieldsCount++;
     }
 
-    for (unsigned int i = 0; i < scanSector.meetings; ++i)
+    for (unsigned int i = 0; i < scanSector.encounters; ++i)
     {
         auto index = randomNumberGenerator->GenerateBetweenInclusive(0, columnCount - usedFieldsCount - 1);
 
-        *sectorFieldThings[index] = domain::models::SectorFieldThing::Meeting;
+        *sectorFieldThings[index] = domain::models::SectorFieldThing::Encounter;
 
         sectorFieldThings[index] = sectorFieldThings[columnCount - usedFieldsCount - 1];
 

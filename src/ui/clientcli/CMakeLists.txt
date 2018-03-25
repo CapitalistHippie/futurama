@@ -23,8 +23,8 @@ add_executable(${FUTURAMA_UI_CLIENT_CLI_TARGET_NAME}
     "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlermenu.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlerontheway.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlerontheway.h"
-    "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlerpickingmeetingcharacter.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlerpickingmeetingcharacter.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlerpickingencounternegotiator.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/fut/ui/statehandlerpickingencounternegotiator.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp")
 
 target_include_directories(${FUTURAMA_UI_CLIENT_CLI_TARGET_NAME}

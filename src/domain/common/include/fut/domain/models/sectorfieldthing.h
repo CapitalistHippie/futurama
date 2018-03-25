@@ -7,7 +7,7 @@ enum class SectorFieldThing
 {
     Empty,
     Asteroid,
-    Meeting,
+    Encounter,
     Planet
 }; // enum class SectorFieldThing
 } // namespace fut::domain::models

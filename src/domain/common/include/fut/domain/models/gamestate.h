@@ -7,8 +7,8 @@ enum class GameState
 {
     Headquarters,
     OnTheWay,
-    PickingMeetingCharacter,
-    InMeeting,
+    PickingEncounterNegotiator,
+    InEncounter,
     Win,
     Lose
 }; // enum class GameState

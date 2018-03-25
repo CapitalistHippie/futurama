@@ -1,39 +1,39 @@
-#ifndef FUTURAMA_FUT_DOMAIN_MODELS_MEETING_H_INCLUDED
-#define FUTURAMA_FUT_DOMAIN_MODELS_MEETING_H_INCLUDED
+#ifndef FUTURAMA_FUT_DOMAIN_MODELS_ENCOUNTER_H_INCLUDED
+#define FUTURAMA_FUT_DOMAIN_MODELS_ENCOUNTER_H_INCLUDED
 
 #include "fut/domain/models/character.h"
-#include "fut/domain/models/meetingconsequence.h"
+#include "fut/domain/models/encounterconsequence.h"
 
 namespace fut::domain::models
 {
-struct Meeting
+struct Encounter
 {
     char description[64] = "";
 
     Character negotiator;
 
-    domain::models::MeetingConsequence fryConsequence;
+    domain::models::EncounterConsequence fryConsequence;
     unsigned int fryDamageMin = 0;
     unsigned int fryDamageMax = 0;
 
     char leelaNegotiationText[64] = "";
-    domain::models::MeetingConsequence leelaNegotiationConsequence;
+    domain::models::EncounterConsequence leelaNegotiationConsequence;
     unsigned int leelaDamageMin = 0;
     unsigned int leelaDamageMax = 0;
     int leelaVictoryPoints = 0;
 
     char benderSuccessText[64] = "";
-    domain::models::MeetingConsequence benderSuccessConsequence;
+    domain::models::EncounterConsequence benderSuccessConsequence;
     unsigned int benderSuccessDamageMin = 0;
     unsigned int benderSuccessDamageMax = 0;
     int benderSuccessVictoryPoints = 0;
 
     char benderFailureText[64] = "";
-    domain::models::MeetingConsequence benderFailureConsequence;
+    domain::models::EncounterConsequence benderFailureConsequence;
     unsigned int benderFailureDamageMin = 0;
     unsigned int benderFailureDamageMax = 0;
     int benderFailureVictoryPoints = 0;
-}; // struct Meeting
+}; // struct Encounter
 } // namespace fut::domain::models
 
-#endif // #ifndef FUTURAMA_FUT_DOMAIN_MODELS_MEETING_H_INCLUDED
+#endif // #ifndef FUTURAMA_FUT_DOMAIN_MODELS_ENCOUNTER_H_INCLUDED

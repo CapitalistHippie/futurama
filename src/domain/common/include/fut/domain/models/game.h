@@ -1,8 +1,8 @@
 #ifndef FUTURAMA_FUT_DOMAIN_MODELS_GAME_H_INCLUDED
 #define FUTURAMA_FUT_DOMAIN_MODELS_GAME_H_INCLUDED
 
+#include "fut/domain/models/encounter.h"
 #include "fut/domain/models/gamestate.h"
-#include "fut/domain/models/meeting.h"
 #include "fut/domain/models/player.h"
 #include "fut/domain/models/ship.h"
 #include "fut/domain/models/universe.h"
@@ -15,13 +15,13 @@ struct Game
     Player player;
     Ship ship;
     Universe universe;
-    Meeting* meeting = nullptr;
+    Encounter* encounter = nullptr;
 
     ~Game()
     {
-        if (meeting != nullptr)
+        if (encounter != nullptr)
         {
-            delete meeting;
+            delete encounter;
         }
     }
 }; // struct Game

@@ -17,7 +17,7 @@ domain::models::Scan ScanGenerator::GenerateScan() const
         for (unsigned int ii = 0; ii < domain::models::Scan::RowCount; ++ii)
         {
             scan.sectors[i][ii].asteroids = randomNumberGenerator->GenerateBetweenInclusive(0, 9);
-            scan.sectors[i][ii].meetings = randomNumberGenerator->GenerateBetweenInclusive(0, 3);
+            scan.sectors[i][ii].encounters = randomNumberGenerator->GenerateBetweenInclusive(0, 3);
             scan.sectors[i][ii].planets = randomNumberGenerator->GenerateBetweenInclusive(0, 2);
         }
     }

@@ -1,5 +1,5 @@
-#ifndef FUTURAMA_FUT_UI_STATEHANDLERPICKINGMEETINGCHARACTER_H_INCLUDED
-#define FUTURAMA_FUT_UI_STATEHANDLERPICKINGMEETINGCHARACTER_H_INCLUDED
+#ifndef FUTURAMA_FUT_UI_STATEHANDLERPICKINGENCOUNTERNEGOTIATOR_H_INCLUDED
+#define FUTURAMA_FUT_UI_STATEHANDLERPICKINGENCOUNTERNEGOTIATOR_H_INCLUDED
 
 #include <fut/domain/events/statechanged.h>
 
@@ -8,7 +8,7 @@
 
 namespace fut::ui
 {
-class StateHandlerPickingMeetingCharacter : public StateHandlerBase
+class StateHandlerPickingEncounterNegotiator : public StateHandlerBase
 {
   private:
     void ExitStateBase() noexcept override;
@@ -22,7 +22,7 @@ class StateHandlerPickingMeetingCharacter : public StateHandlerBase
     using StateHandlerBase::StateHandlerBase;
 
     void EnterState() override;
-}; // class StateHandlerPickingMeetingCharacter
+}; // class StateHandlerPickingEncounterNegotiator
 } // namespace fut::ui
 
-#endif // FUTURAMA_FUT_UI_STATEHANDLERPICKINGMEETINGCHARACTER_H_INCLUDED
+#endif // #ifndef FUTURAMA_FUT_UI_STATEHANDLERPICKINGENCOUNTERNEGOTIATOR_H_INCLUDED

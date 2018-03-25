@@ -102,24 +102,24 @@ void Game::MoveToField(const infra::Point& fieldPoint)
     eventsSubject.NotifyObservers(movedToFieldEvent);
 }
 
-void fut::app::Game::EnterMeeting()
+void fut::app::Game::EnterEncounter()
 {
     if (data.gameState != domain::models::GameState::OnTheWay)
     {
-        throw std::exception("Player can only move into a meeting while on the way.");
+        throw std::exception("Player can only move into an encounter while on the way.");
     }
 
-    auto meeting = meetingRepository->GetRandomMeeting();
-    data.meeting = new domain::models::Meeting(std::move(meeting));
+    auto encounter = encounterRepository->GetRandomEncounter();
+    data.encounter = new domain::models::Encounter(std::move(encounter));
 
     try
     {
-        SetState(domain::models::GameState::PickingMeetingCharacter);
+        SetState(domain::models::GameState::PickingEncounterNegotiator);
     }
     catch (...)
     {
-        delete data.meeting;
-        data.meeting = nullptr;
+        delete data.encounter;
+        data.encounter = nullptr;
 
         throw;
     }
@@ -437,6 +437,17 @@ domain::models::Package fut::app::Game::GeneratePackage()
     return package;
 }
 
+void Game::RemoveEncounter()
+{
+    if (data.encounter == nullptr)
+    {
+        return;
+    }
+
+    delete data.encounter;
+    data.encounter = nullptr;
+}
+
 void Game::RemovePackage()
 {
     if (!HavePackage())
@@ -446,17 +457,6 @@ void Game::RemovePackage()
 
     delete data.ship.package;
     data.ship.package = nullptr;
-}
-
-void Game::RemoveMeeting()
-{
-    if (data.meeting == nullptr)
-    {
-        return;
-    }
-
-    delete data.meeting;
-    data.meeting = nullptr;
 }
 
 void Game::ChangeVictoryPoints(int points)
@@ -495,66 +495,66 @@ void Game::EndTurn()
         return;
     }
 
-    MoveMeetings();
+    MoveEncounters();
 
-    if (IsShipNextToThing(domain::models::SectorFieldThing::Meeting))
+    if (IsShipNextToThing(domain::models::SectorFieldThing::Encounter))
     {
-        EnterMeeting();
+        EnterEncounter();
     }
 }
 
-void Game::MoveMeetings()
+void Game::MoveEncounters()
 {
     if (data.gameState != domain::models::GameState::OnTheWay)
     {
-        throw std::exception("Can only move meetings while on the way.");
+        throw std::exception("Can only move encounters while the game state is OnTheWay.");
     }
 
     auto& sector = GetOrGenerateSector(data.ship.sectorPoint);
     const auto& shipFieldPoint = data.ship.fieldPoint;
 
-    unsigned int meetingCount = 0;
-    infra::Point meetingFieldPoints[3];
+    unsigned int encounterCount = 0;
+    infra::Point encounterFieldPoints[3];
 
     for (int i = 0; i < domain::models::Sector::ColumnCount; ++i)
     {
         for (int ii = 0; ii < domain::models::Sector::RowCount; ++ii)
         {
-            if (sector.fields[i][ii].thing == domain::models::SectorFieldThing::Meeting)
+            if (sector.fields[i][ii].thing == domain::models::SectorFieldThing::Encounter)
             {
-                meetingFieldPoints[meetingCount++] = infra::Point(i, ii);
+                encounterFieldPoints[encounterCount++] = infra::Point(i, ii);
             }
         }
     }
 
-    for (unsigned int i = 0; i < meetingCount; ++i)
+    for (unsigned int i = 0; i < encounterCount; ++i)
     {
-        if (infra::IsPointNextToPoint(meetingFieldPoints[i], shipFieldPoint))
+        if (infra::IsPointNextToPoint(encounterFieldPoints[i], shipFieldPoint))
         {
             continue;
         }
 
-        auto x = meetingFieldPoints[i].x;
-        auto y = meetingFieldPoints[i].y;
+        auto x = encounterFieldPoints[i].x;
+        auto y = encounterFieldPoints[i].y;
 
         if (x < data.ship.fieldPoint.x && sector.fields[x + 1][y].thing == domain::models::SectorFieldThing::Empty)
         {
-            sector.fields[x + 1][y].thing = domain::models::SectorFieldThing::Meeting;
+            sector.fields[x + 1][y].thing = domain::models::SectorFieldThing::Encounter;
             sector.fields[x][y].thing = domain::models::SectorFieldThing::Empty;
         }
         else if (x > data.ship.fieldPoint.x && sector.fields[x - 1][y].thing == domain::models::SectorFieldThing::Empty)
         {
-            sector.fields[x - 1][y].thing = domain::models::SectorFieldThing::Meeting;
+            sector.fields[x - 1][y].thing = domain::models::SectorFieldThing::Encounter;
             sector.fields[x][y].thing = domain::models::SectorFieldThing::Empty;
         }
         else if (y < data.ship.fieldPoint.y && sector.fields[x][y + 1].thing == domain::models::SectorFieldThing::Empty)
         {
-            sector.fields[x][y + 1].thing = domain::models::SectorFieldThing::Meeting;
+            sector.fields[x][y + 1].thing = domain::models::SectorFieldThing::Encounter;
             sector.fields[x][y].thing = domain::models::SectorFieldThing::Empty;
         }
         else if (y > data.ship.fieldPoint.y && sector.fields[x][y - 1].thing == domain::models::SectorFieldThing::Empty)
         {
-            sector.fields[x][y - 1].thing = domain::models::SectorFieldThing::Meeting;
+            sector.fields[x][y - 1].thing = domain::models::SectorFieldThing::Encounter;
             sector.fields[x][y].thing = domain::models::SectorFieldThing::Empty;
         }
     }
@@ -572,11 +572,11 @@ void Game::SetState(domain::models::GameState state)
 }
 
 Game::Game(infra::RandomNumberGenerator& randomNumberGenerator,
-           dal::PackageRepository& packageRepository,
-           dal::MeetingRepository& meetingRepository)
+           dal::EncounterRepository& encounterRepository,
+           dal::PackageRepository& packageRepository)
   : randomNumberGenerator(&randomNumberGenerator)
+  , encounterRepository(&encounterRepository)
   , packageRepository(&packageRepository)
-  , meetingRepository(&meetingRepository)
   , scanGenerator(randomNumberGenerator)
   , sectorGenerator(randomNumberGenerator)
 {
@@ -706,7 +706,7 @@ void Game::Reset()
     data.gameState = domain::models::GameState::Headquarters;
 
     RemovePackage();
-    RemoveMeeting();
+    RemoveEncounter();
 }
 
 void Game::MoveToSector(const infra::Point& sectorPoint)
@@ -829,13 +829,13 @@ void Game::SkipTurn()
 
 void Game::PickEncounterNegotiator(domain::models::Character negotiator)
 {
-    if (data.gameState != domain::models::GameState::PickingMeetingCharacter)
+    if (data.gameState != domain::models::GameState::PickingEncounterNegotiator)
     {
         throw std::exception(
-          "Can only pick an encounter negotiator if the game is in the PickingMeetingCharacter state.");
+          "Can only pick an encounter negotiator if the game is in the PickingEncounterNegotiator state.");
     }
 
-    data.meeting->negotiator = negotiator;
+    data.encounter->negotiator = negotiator;
 
-    SetState(domain::models::GameState::InMeeting);
+    SetState(domain::models::GameState::InEncounter);
 }

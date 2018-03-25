@@ -6,7 +6,7 @@ namespace fut::domain::models
 struct ScanSector
 {
     unsigned int asteroids = 0;
-    unsigned int meetings = 0;
+    unsigned int encounters = 0;
     unsigned int planets = 0;
 }; // struct ScanSector
 } // namespace fut::domain::models

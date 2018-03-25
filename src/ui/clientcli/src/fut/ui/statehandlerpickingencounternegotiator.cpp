@@ -1,4 +1,4 @@
-#include "fut/ui/statehandlerpickingmeetingcharacter.h"
+#include "fut/ui/statehandlerpickingencounternegotiator.h"
 
 #include <functional>
 
@@ -10,11 +10,11 @@
 
 using namespace fut::ui;
 
-void StateHandlerPickingMeetingCharacter::ExitStateBase() noexcept
+void StateHandlerPickingEncounterNegotiator::ExitStateBase() noexcept
 {
 }
 
-void StateHandlerPickingMeetingCharacter::PickCommandHandler(const Command& command) const
+void StateHandlerPickingEncounterNegotiator::PickCommandHandler(const Command& command) const
 {
     if (command.argumentCount < 1)
     {
@@ -40,10 +40,10 @@ void StateHandlerPickingMeetingCharacter::PickCommandHandler(const Command& comm
     }
 }
 
-void fut::ui::StateHandlerPickingMeetingCharacter::StateChangedGameEventHandler(
+void fut::ui::StateHandlerPickingEncounterNegotiator::StateChangedGameEventHandler(
   const domain::events::StateChanged& evt) const
 {
-    if (evt.newState != domain::models::GameState::InMeeting)
+    if (evt.newState != domain::models::GameState::InEncounter)
     {
         return;
     }
@@ -51,14 +51,14 @@ void fut::ui::StateHandlerPickingMeetingCharacter::StateChangedGameEventHandler(
     // context->SetStateHandler<StateHandlerHeadquarters>();
 }
 
-void StateHandlerPickingMeetingCharacter::PrintCli(const char* extra) const
+void StateHandlerPickingEncounterNegotiator::PrintCli(const char* extra) const
 {
     infra::ClearCli();
-    *outputStream << "You encountered " << client->GetGame().GetData().meeting->description
+    *outputStream << "You encountered " << client->GetGame().GetData().encounter->description
                   << "! Pick either Fry, Leela or Bender to deal with the situation.\n\n";
 
     *outputStream << "Available commands.\n"
-                  << "pick <character>\t-- Pick a character.\n"
+                  << "pick <character>\t-- Pick a negotiator.\n"
                   << "quit/exit/stop\t\t-- Quit the game.\n\n";
 
     if (extra != nullptr)
@@ -67,13 +67,13 @@ void StateHandlerPickingMeetingCharacter::PrintCli(const char* extra) const
     }
 }
 
-void StateHandlerPickingMeetingCharacter::EnterState()
+void StateHandlerPickingEncounterNegotiator::EnterState()
 {
     RegisterCommandObserver(
-      "pick", std::bind(&StateHandlerPickingMeetingCharacter::PickCommandHandler, this, std::placeholders::_1));
+      "pick", std::bind(&StateHandlerPickingEncounterNegotiator::PickCommandHandler, this, std::placeholders::_1));
 
     RegisterGameEventObserver<domain::events::StateChanged>(
-      std::bind(&StateHandlerPickingMeetingCharacter::StateChangedGameEventHandler, this, std::placeholders::_1));
+      std::bind(&StateHandlerPickingEncounterNegotiator::StateChangedGameEventHandler, this, std::placeholders::_1));
 
     PrintCli();
 }

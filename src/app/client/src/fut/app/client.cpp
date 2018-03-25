@@ -8,11 +8,11 @@ using namespace fut;
 using namespace fut::app;
 
 Client::Client()
-  : meetingRepository(randomNumberGenerator)
+  : encounterRepository(randomNumberGenerator)
   , packageRepository(randomNumberGenerator)
-  , game(randomNumberGenerator, packageRepository, meetingRepository)
+  , game(randomNumberGenerator, encounterRepository, packageRepository)
 {
-    meetingRepository.ReadMeetingsFromCsv("D:/Projects/futurama/repo/assets/meetings.csv");
+    encounterRepository.ReadEncountersFromCsv("D:/Projects/futurama/repo/assets/encounters.csv");
     packageRepository.ReadPackagesFromCsv("D:/Projects/futurama/repo/assets/packages.csv");
 }
 

@@ -11,7 +11,7 @@
 #include <fut/infra/clihelpers.h>
 
 #include "fut/ui/statehandlerheadquarters.h"
-#include "fut/ui/statehandlerpickingmeetingcharacter.h"
+#include "fut/ui/statehandlerpickingencounternegotiator.h"
 
 using namespace fut;
 using namespace fut::ui;
@@ -146,12 +146,12 @@ void StateHandlerOnTheWay::PackagePickedUpGameEventHandler() const
 
 void StateHandlerOnTheWay::StateChangedGameEventHandler(const domain::events::StateChanged& evt) const
 {
-    if (evt.newState != domain::models::GameState::PickingMeetingCharacter)
+    if (evt.newState != domain::models::GameState::PickingEncounterNegotiator)
     {
         return;
     }
 
-    context->SetStateHandler<StateHandlerPickingMeetingCharacter>();
+    context->SetStateHandler<StateHandlerPickingEncounterNegotiator>();
 }
 
 void StateHandlerOnTheWay::PrintCliWithPackageInfo() const
@@ -218,7 +218,7 @@ void StateHandlerOnTheWay::PrintSector() const
                 case domain::models::SectorFieldThing::Asteroid:
                     *outputStream << "O ";
                     break;
-                case domain::models::SectorFieldThing::Meeting:
+                case domain::models::SectorFieldThing::Encounter:
                     *outputStream << "* ";
                     break;
                 case domain::models::SectorFieldThing::Planet:

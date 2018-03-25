@@ -120,7 +120,7 @@ void StateHandlerHeadquarters::PrintScan() const
         {
             const auto& sector = scan.sectors[ii][i];
 
-            *outputStream << sector.asteroids << sector.meetings << sector.planets << ' ';
+            *outputStream << sector.asteroids << sector.encounters << sector.planets << ' ';
         }
 
         if (i != scan.RowCount - 1)
