@@ -2,11 +2,12 @@
 
 #include <functional>
 
+#include <fut/domain/events/encounterstarted.h>
 #include <fut/domain/models/character.h>
 #include <fut/domain/models/gamestate.h>
 #include <fut/infra/clihelpers.h>
 
-//#include "fut/ui/statehandlerheadquarters.h"
+#include "fut/ui/statehandlerinencounter.h"
 
 using namespace fut::ui;
 
@@ -22,33 +23,32 @@ void StateHandlerPickingEncounterNegotiator::PickCommandHandler(const Command& c
         return;
     }
 
+    domain::models::Character negotiator;
+
     if (strcmp(command.arguments[0], "fry") == 0)
     {
-        client->PickEncounterNegotiator(domain::models::Character::Fry);
+        negotiator = domain::models::Character::Fry;
     }
     else if (strcmp(command.arguments[0], "leela") == 0)
     {
-        client->PickEncounterNegotiator(domain::models::Character::Leela);
+        negotiator = domain::models::Character::Leela;
     }
     else if (strcmp(command.arguments[0], "bender") == 0)
     {
-        client->PickEncounterNegotiator(domain::models::Character::Bender);
+        negotiator = domain::models::Character::Bender;
     }
     else
     {
         PrintCli("Unknown character.");
-    }
-}
-
-void fut::ui::StateHandlerPickingEncounterNegotiator::StateChangedGameEventHandler(
-  const domain::events::StateChanged& evt) const
-{
-    if (evt.newState != domain::models::GameState::InEncounter)
-    {
         return;
     }
 
-    // context->SetStateHandler<StateHandlerHeadquarters>();
+    client->PickEncounterNegotiator(negotiator);
+}
+
+void fut::ui::StateHandlerPickingEncounterNegotiator::EncounterStartedGameEventHandler() const
+{
+    context->SetStateHandler<StateHandlerInEncounter>();
 }
 
 void StateHandlerPickingEncounterNegotiator::PrintCli(const char* extra) const
@@ -72,8 +72,8 @@ void StateHandlerPickingEncounterNegotiator::EnterState()
     RegisterCommandObserver(
       "pick", std::bind(&StateHandlerPickingEncounterNegotiator::PickCommandHandler, this, std::placeholders::_1));
 
-    RegisterGameEventObserver<domain::events::StateChanged>(
-      std::bind(&StateHandlerPickingEncounterNegotiator::StateChangedGameEventHandler, this, std::placeholders::_1));
+    RegisterGameEventObserver<domain::events::EncounterStarted>(
+      std::bind(&StateHandlerPickingEncounterNegotiator::EncounterStartedGameEventHandler, this));
 
     PrintCli();
 }

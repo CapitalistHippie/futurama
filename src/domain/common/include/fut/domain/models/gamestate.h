@@ -8,7 +8,6 @@ enum class GameState
     Headquarters,
     OnTheWay,
     PickingEncounterNegotiator,
-    InEncounter,
     Win,
     Lose
 }; // enum class GameState

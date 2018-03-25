@@ -49,7 +49,10 @@ class Game
     domain::models::Sector& GetOrGenerateSector(const infra::Point& sectorPoint);
     domain::models::Package GeneratePackage();
     void RemoveEncounter();
+    void RemoveEncounterInstance();
     void RemovePackage();
+    void RepairShip();
+    void DamageShip(unsigned int damage);
     void ChangeVictoryPoints(int points);
     void EndTurn();
     void MoveEncounters();

@@ -4,12 +4,15 @@
 #include <exception>
 
 #include <fut/domain/events/encountersmoved.h>
+#include <fut/domain/events/encounterstarted.h>
 #include <fut/domain/events/movedtofield.h>
 #include <fut/domain/events/movedtoheadquarters.h>
 #include <fut/domain/events/movedtosector.h>
 #include <fut/domain/events/packagepickedup.h>
+#include <fut/domain/events/shiprepaired.h>
 #include <fut/domain/events/statechanged.h>
 #include <fut/domain/events/victorypointschanged.h>
+#include <fut/domain/models/encounterinstance.h>
 #include <fut/domain/models/gamestate.h>
 #include <fut/infra/point.h>
 
@@ -35,8 +38,9 @@ void Game::MoveToHeadQuarters()
     }
 
     data.universe.scan = scanGenerator.GenerateScan();
-    data.ship.damagePoints = 0;
     data.gameState = domain::models::GameState::Headquarters;
+
+    RepairShip();
 
     // Throw event.
     domain::events::MovedToHeadquarters movedToHeadquartersEvent;
@@ -449,6 +453,17 @@ void Game::RemoveEncounter()
     data.encounter = nullptr;
 }
 
+void Game::RemoveEncounterInstance()
+{
+    if (data.encounterInstance == nullptr)
+    {
+        return;
+    }
+
+    delete data.encounterInstance;
+    data.encounterInstance = nullptr;
+}
+
 void Game::RemovePackage()
 {
     if (!HavePackage())
@@ -458,6 +473,26 @@ void Game::RemovePackage()
 
     delete data.ship.package;
     data.ship.package = nullptr;
+}
+
+void Game::RepairShip()
+{
+    domain::events::ShipRepaired shipRepairedEvent;
+    shipRepairedEvent.oldDamagePoints = data.ship.damagePoints;
+
+    data.ship.damagePoints = 0;
+
+    eventsSubject.NotifyObservers(shipRepairedEvent);
+}
+
+void Game::DamageShip(unsigned int damage)
+{
+    data.ship.damagePoints += damage;
+
+    if (data.ship.damagePoints >= 200)
+    {
+        SetState(domain::models::GameState::Lose);
+    }
 }
 
 void Game::ChangeVictoryPoints(int points)
@@ -481,11 +516,6 @@ void Game::ChangeVictoryPoints(int points)
     victoryPointsChangedEvent.oldPoints = oldPoints;
     victoryPointsChangedEvent.newPoints = data.player.victoryPoints;
     eventsSubject.NotifyObservers(victoryPointsChangedEvent);
-
-    if (data.player.victoryPoints >= 10)
-    {
-        SetState(domain::models::GameState::Win);
-    }
 }
 
 void Game::EndTurn()
@@ -825,6 +855,11 @@ void Game::DeliverPackage()
     MoveToHeadQuarters();
 
     ChangeVictoryPoints(1);
+
+    if (data.player.victoryPoints >= 10)
+    {
+        SetState(domain::models::GameState::Win);
+    }
 }
 
 void Game::SkipTurn()
@@ -840,7 +875,108 @@ void Game::PickEncounterNegotiator(domain::models::Character negotiator)
           "Can only pick an encounter negotiator if the game is in the PickingEncounterNegotiator state.");
     }
 
-    data.encounter->negotiator = negotiator;
+    // Generate an encounter instance.
+    domain::models::EncounterInstance encounter;
+    data.encounterInstance = &encounter;
+    encounter.negotiator = negotiator;
+    strcpy(encounter.description, data.encounter->description);
 
-    SetState(domain::models::GameState::InEncounter);
+    switch (negotiator)
+    {
+        case domain::models::Character::Fry:
+            encounter.consequence = domain::models::EncounterConsequence::Battle;
+            encounter.damageMin = data.encounter->fryDamageMin;
+            encounter.damageMax = data.encounter->fryDamageMax;
+            break;
+        case domain::models::Character::Leela:
+            encounter.consequence = data.encounter->leelaNegotiationConsequence;
+            strcpy(encounter.consequenceText, data.encounter->leelaNegotiationText);
+
+            if (encounter.consequence == domain::models::EncounterConsequence::Battle)
+            {
+                encounter.damageMin = data.encounter->leelaDamageMin;
+                encounter.damageMax = data.encounter->leelaDamageMax;
+            }
+            else if (encounter.consequence == domain::models::EncounterConsequence::VictoryPoints)
+            {
+                encounter.victoryPoints = data.encounter->leelaVictoryPoints;
+            }
+            break;
+        case domain::models::Character::Bender:
+            if (randomNumberGenerator->GenerateBetweenInclusive(0, 1) == 0)
+            {
+                encounter.consequence = data.encounter->benderSuccessConsequence;
+                strcpy(encounter.consequenceText, data.encounter->benderSuccessText);
+
+                if (encounter.consequence == domain::models::EncounterConsequence::Battle)
+                {
+                    encounter.damageMin = data.encounter->benderSuccessDamageMin;
+                    encounter.damageMax = data.encounter->benderSuccessDamageMax;
+                }
+                else if (encounter.consequence == domain::models::EncounterConsequence::VictoryPoints)
+                {
+                    encounter.victoryPoints = data.encounter->benderSuccessVictoryPoints;
+                }
+            }
+            else
+            {
+                encounter.consequence = data.encounter->benderFailureConsequence;
+                strcpy(encounter.consequenceText, data.encounter->benderFailureText);
+
+                if (encounter.consequence == domain::models::EncounterConsequence::Battle)
+                {
+                    encounter.damageMin = data.encounter->benderFailureDamageMin;
+                    encounter.damageMax = data.encounter->benderFailureDamageMax;
+                }
+                else if (encounter.consequence == domain::models::EncounterConsequence::VictoryPoints)
+                {
+                    encounter.victoryPoints = data.encounter->benderFailureVictoryPoints;
+                }
+            }
+            break;
+    }
+
+    domain::events::EncounterStarted encounterStartedEvent;
+    encounterStartedEvent.encounter = &encounter;
+    eventsSubject.NotifyObservers(encounterStartedEvent);
+
+    // Handle the encounter.
+    switch (encounter.consequence)
+    {
+        case domain::models::EncounterConsequence::Repair:
+            RepairShip();
+            break;
+        case domain::models::EncounterConsequence::VictoryPoints:
+            ChangeVictoryPoints(encounter.victoryPoints);
+            break;
+        case domain::models::EncounterConsequence::Battle:
+            while (true)
+            {
+                unsigned int damage =
+                  randomNumberGenerator->GenerateBetweenInclusive(encounter.damageMin, encounter.damageMax);
+
+                DamageShip(damage);
+
+                if (data.gameState == domain::models::GameState::Lose)
+                {
+                    break;
+                }
+
+                if (randomNumberGenerator->GenerateBetweenInclusive(0, 1) == 0)
+                {
+                    encounter.enemyHitCount++;
+
+                    if (encounter.enemyHitCount == 3)
+                    {
+                        break;
+                    }
+                }
+            }
+            break;
+        case domain::models::EncounterConsequence::Nothing:
+            break;
+    }
+
+    RemoveEncounter();
+    data.encounterInstance = nullptr;
 }

@@ -8,27 +8,25 @@ namespace fut::domain::models
 {
 struct Encounter
 {
-    char description[64] = "";
-
-    Character negotiator;
+    char description[256] = "";
 
     domain::models::EncounterConsequence fryConsequence;
     unsigned int fryDamageMin = 0;
     unsigned int fryDamageMax = 0;
 
-    char leelaNegotiationText[64] = "";
+    char leelaNegotiationText[256] = "";
     domain::models::EncounterConsequence leelaNegotiationConsequence;
     unsigned int leelaDamageMin = 0;
     unsigned int leelaDamageMax = 0;
     int leelaVictoryPoints = 0;
 
-    char benderSuccessText[64] = "";
+    char benderSuccessText[256] = "";
     domain::models::EncounterConsequence benderSuccessConsequence;
     unsigned int benderSuccessDamageMin = 0;
     unsigned int benderSuccessDamageMax = 0;
     int benderSuccessVictoryPoints = 0;
 
-    char benderFailureText[64] = "";
+    char benderFailureText[256] = "";
     domain::models::EncounterConsequence benderFailureConsequence;
     unsigned int benderFailureDamageMin = 0;
     unsigned int benderFailureDamageMax = 0;

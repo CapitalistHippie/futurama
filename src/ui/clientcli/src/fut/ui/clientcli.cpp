@@ -75,26 +75,8 @@ void ClientCli::Start()
 
     do
     {
-        try
-        {
-            auto command = commandParser.ParseCommand(*inputStream);
-            commandsSubject.NotifyObservers(command);
-        }
-        catch (const std::system_error& e)
-        {
-            // if (e.code() == infra::FunctionalError::CommandNotRegistered)
-            //{
-            //    *outputStream << "Unavailable or unknown command. Please try something else!\n\n";
-            //}
-            // else if (e.code() == infra::FunctionalError::CommandInvalidParameterInputType)
-            //{
-            //    *outputStream << "Invalid parameter(s). Please try something else!\n\n";
-            //}
-            // else
-            //{
-            //    throw;
-            //}
-        }
+        auto command = commandParser.ParseCommand(*inputStream);
+        commandsSubject.NotifyObservers(command);
     } while (!shouldStop);
 
     // Cleanup should be done here.

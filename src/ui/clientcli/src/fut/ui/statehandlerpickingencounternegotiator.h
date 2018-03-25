@@ -1,8 +1,6 @@
 #ifndef FUTURAMA_FUT_UI_STATEHANDLERPICKINGENCOUNTERNEGOTIATOR_H_INCLUDED
 #define FUTURAMA_FUT_UI_STATEHANDLERPICKINGENCOUNTERNEGOTIATOR_H_INCLUDED
 
-#include <fut/domain/events/statechanged.h>
-
 #include "fut/ui/command.h"
 #include "fut/ui/statehandlerbase.h"
 
@@ -14,7 +12,7 @@ class StateHandlerPickingEncounterNegotiator : public StateHandlerBase
     void ExitStateBase() noexcept override;
 
     void PickCommandHandler(const Command& command) const;
-    void StateChangedGameEventHandler(const domain::events::StateChanged& evt) const;
+    void EncounterStartedGameEventHandler() const;
 
     void PrintCli(const char* extra = nullptr) const;
 
