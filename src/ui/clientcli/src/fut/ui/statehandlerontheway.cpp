@@ -86,6 +86,7 @@ void StateHandlerOnTheWay::PickupCommandHandler() const
     }
 
     client->PickupPackage();
+    PrintCliWithPackageInfo();
 }
 
 void StateHandlerOnTheWay::ExamineCommandHandler() const

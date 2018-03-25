@@ -38,10 +38,14 @@ class Game
     void GetFieldsAroundPoint(infra::Point fieldPoint,
                               const domain::models::SectorField** fieldsBuffer,
                               unsigned int& fieldCountBuffer) const;
+    void GetFieldsAroundPoint(infra::Point fieldPoint,
+                              domain::models::SectorField** fieldsBuffer,
+                              unsigned int& fieldCountBuffer);
     void GetScanSectorsAroundPoint(infra::Point sectorPoint,
                                    const domain::models::ScanSector** scanSectorsBuffer,
                                    unsigned int& scanSectorCountBuffer) const;
     const domain::models::SectorField& GetField(const infra::Point& fieldPoint) const;
+    domain::models::SectorField& GetField(const infra::Point& fieldPoint);
     const domain::models::ScanSector& GetScanSector(const infra::Point& sectorPoint) const;
     bool IsPointOutsideUniverse(const infra::Point& fieldPoint) const;
     bool IsPointOutsideSector(const infra::Point& fieldPoint) const;

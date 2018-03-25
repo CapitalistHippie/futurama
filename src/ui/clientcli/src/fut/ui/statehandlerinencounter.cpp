@@ -8,6 +8,9 @@
 #include <fut/domain/models/encounterinstance.h>
 #include <fut/infra/clihelpers.h>
 
+#include "fut/ui/statehandlergameend.h"
+#include "fut/ui/statehandlerontheway.h"
+
 using namespace fut::ui;
 
 void StateHandlerInEncounter::ExitStateBase() noexcept
@@ -16,6 +19,14 @@ void StateHandlerInEncounter::ExitStateBase() noexcept
 
 void StateHandlerInEncounter::ContinueCommandHandler() const
 {
+    if (client->GetGame().GetData().gameState == domain::models::GameState::Lose)
+    {
+        context->SetStateHandler<StateHandlerGameEnd>();
+    }
+    else
+    {
+        context->SetStateHandler<StateHandlerOnTheWay>();
+    }
 }
 
 void fut::ui::StateHandlerInEncounter::ShipRepairedGameEventHandler() const
@@ -60,7 +71,7 @@ void StateHandlerInEncounter::PrintCli(const char* extra) const
     *outputStream << "\n\n";
 
     *outputStream << "Available commands.\n"
-                  << "continue\t\t-- Continue with your journey.\n"
+                  << "continue\t\t-- Continue.\n"
                   << "quit/exit/stop\t\t-- Quit the game.\n\n";
 
     if (extra != nullptr)

@@ -236,6 +236,62 @@ void Game::GetFieldsAroundPoint(infra::Point fieldPoint,
     }
 }
 
+void Game::GetFieldsAroundPoint(infra::Point fieldPoint,
+                                domain::models::SectorField** fieldsBuffer,
+                                unsigned int& fieldCountBuffer)
+{
+    fieldCountBuffer = 0;
+
+    fieldPoint.x -= 1;
+    fieldPoint.y -= 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.x += 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.x += 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.y += 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.y += 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.x -= 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.x -= 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+
+    fieldPoint.y -= 1;
+    if (!IsPointOutsideSector(fieldPoint))
+    {
+        fieldsBuffer[fieldCountBuffer++] = &GetField(fieldPoint);
+    }
+}
+
 void fut::app::Game::GetScanSectorsAroundPoint(infra::Point sectorPoint,
                                                const domain::models::ScanSector** scanSectorsBuffer,
                                                unsigned int& scanSectorCountBuffer) const
@@ -293,6 +349,11 @@ void fut::app::Game::GetScanSectorsAroundPoint(infra::Point sectorPoint,
 }
 
 const domain::models::SectorField& Game::GetField(const infra::Point& fieldPoint) const
+{
+    return data.universe.sectors[data.ship.sectorPoint.x][data.ship.sectorPoint.y]->fields[fieldPoint.x][fieldPoint.y];
+}
+
+domain::models::SectorField& fut::app::Game::GetField(const infra::Point& fieldPoint)
 {
     return data.universe.sectors[data.ship.sectorPoint.x][data.ship.sectorPoint.y]->fields[fieldPoint.x][fieldPoint.y];
 }
@@ -387,6 +448,8 @@ domain::models::Package fut::app::Game::GeneratePackage()
     unsigned int eligibleScanSectorCount = 0;
     infra::Point eligibleScanSectorPoints[sectorCount];
 
+    const domain::models::Sector& currentSector = GetCurrentSector();
+
     for (unsigned int i = 0; i < domain::models::Scan::ColumnCount; ++i)
     {
         for (unsigned int ii = 0; ii < domain::models::Scan::RowCount; ++ii)
@@ -397,7 +460,7 @@ domain::models::Package fut::app::Game::GeneratePackage()
                             [&](const domain::models::ScanSector* scanSector) {
                                 return scanSector == &data.universe.scan.sectors[i][ii];
                             }) ||
-                data.universe.scan.sectors[i][ii].planets == 0)
+                data.universe.scan.sectors[i][ii].planets == 0 || data.ship.sectorPoint == infra::Point(i, ii))
             {
                 continue;
             }
@@ -633,6 +696,16 @@ const domain::models::Sector& fut::app::Game::GetCurrentSector() const
     return *data.universe.sectors[data.ship.sectorPoint.x][data.ship.sectorPoint.y];
 }
 
+const domain::models::ScanSector& Game::GetCurrentScanSector() const
+{
+    if (data.gameState != domain::models::GameState::OnTheWay)
+    {
+        throw std::exception("Player is not currently in a sector.");
+    }
+
+    return data.universe.scan.sectors[data.ship.sectorPoint.x][data.ship.sectorPoint.y];
+}
+
 bool Game::CanPickupPackage() const
 {
     if (HavePackage())
@@ -664,7 +737,7 @@ bool Game::CanPickupPackage() const
                             [&](const domain::models::ScanSector* scanSector) {
                                 return scanSector == &data.universe.scan.sectors[i][ii];
                             }) ||
-                data.universe.scan.sectors[i][ii].planets == 0)
+                data.universe.scan.sectors[i][ii].planets == 0 || data.ship.sectorPoint == infra::Point(i, ii))
             {
                 continue;
             }
@@ -977,6 +1050,26 @@ void Game::PickEncounterNegotiator(domain::models::Character negotiator)
             break;
     }
 
+    // Remove encounter instance from the map.
+    domain::models::SectorField* fieldsBuffer[8];
+    unsigned int fieldCountBuffer;
+
+    GetFieldsAroundPoint(data.ship.fieldPoint, fieldsBuffer, fieldCountBuffer);
+
+    for (unsigned int i = 0; i < fieldCountBuffer; ++i)
+    {
+        if (fieldsBuffer[i]->thing == domain::models::SectorFieldThing::Encounter)
+        {
+            fieldsBuffer[i]->thing = domain::models::SectorFieldThing::Empty;
+            break;
+        }
+    }
+
     RemoveEncounter();
     data.encounterInstance = nullptr;
+
+    if (data.gameState != domain::models::GameState::Lose)
+    {
+        data.gameState = domain::models::GameState::OnTheWay;
+    }
 }
