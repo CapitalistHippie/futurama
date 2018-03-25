@@ -37,8 +37,6 @@ void Game::MoveToHeadQuarters()
     data.ship.damagePoints = 0;
     data.gameState = domain::models::GameState::Headquarters;
 
-    RemovePackage();
-
     // Throw event.
     domain::events::MovedToHeadquarters movedToHeadquartersEvent;
     eventsSubject.NotifyObservers(movedToHeadquartersEvent);
@@ -111,7 +109,20 @@ void fut::app::Game::EnterMeeting()
         throw std::exception("Player can only move into a meeting while on the way.");
     }
 
-    // SetState(domain::models::GameState::InMeeting);
+    auto meeting = meetingRepository->GetRandomMeeting();
+    data.meeting = new domain::models::Meeting(std::move(meeting));
+
+    try
+    {
+        SetState(domain::models::GameState::PickingMeetingCharacter);
+    }
+    catch (...)
+    {
+        delete data.meeting;
+        data.meeting = nullptr;
+
+        throw;
+    }
 }
 
 infra::Point fut::app::Game::GetRelativeSectorPoint(const infra::Point& fieldPoint) const
@@ -426,11 +437,6 @@ domain::models::Package fut::app::Game::GeneratePackage()
     return package;
 }
 
-domain::models::Meeting Game::GenerateMeeting()
-{
-    return domain::models::Meeting();
-}
-
 void Game::RemovePackage()
 {
     if (!HavePackage())
@@ -440,6 +446,17 @@ void Game::RemovePackage()
 
     delete data.ship.package;
     data.ship.package = nullptr;
+}
+
+void Game::RemoveMeeting()
+{
+    if (data.meeting == nullptr)
+    {
+        return;
+    }
+
+    delete data.meeting;
+    data.meeting = nullptr;
 }
 
 void Game::ChangeVictoryPoints(int points)
@@ -689,6 +706,7 @@ void Game::Reset()
     data.gameState = domain::models::GameState::Headquarters;
 
     RemovePackage();
+    RemoveMeeting();
 }
 
 void Game::MoveToSector(const infra::Point& sectorPoint)
@@ -796,6 +814,8 @@ void Game::DeliverPackage()
     {
         throw std::exception("Player is not next to the package destination.");
     }
+
+    RemovePackage();
 
     MoveToHeadQuarters();
 

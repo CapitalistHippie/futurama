@@ -2,6 +2,7 @@
 #define FUTURAMA_FUT_DOMAIN_MODELS_GAME_H_INCLUDED
 
 #include "fut/domain/models/gamestate.h"
+#include "fut/domain/models/meeting.h"
 #include "fut/domain/models/player.h"
 #include "fut/domain/models/ship.h"
 #include "fut/domain/models/universe.h"
@@ -14,6 +15,7 @@ struct Game
     Player player;
     Ship ship;
     Universe universe;
+    Meeting* meeting = nullptr;
 }; // struct Game
 } // namespace fut::domain::models
 

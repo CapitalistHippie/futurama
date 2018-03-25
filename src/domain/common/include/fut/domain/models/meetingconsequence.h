@@ -7,7 +7,6 @@ enum class MeetingConsequence
 {
     Battle,
     Nothing,
-    Text,
     VictoryPoints,
     Repair
 }; // enum class MeetingConsequence

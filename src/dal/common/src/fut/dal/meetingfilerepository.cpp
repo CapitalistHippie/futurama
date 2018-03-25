@@ -3,6 +3,32 @@
 using namespace fut;
 using namespace fut::dal;
 
+void MeetingFileRepository::ParseConsequence(const char* consequenceText,
+                                             domain::models::MeetingConsequence& consequenceBuffer,
+                                             unsigned int& damageMinBuffer,
+                                             unsigned int& damageMaxBuffer,
+                                             int& victoryPointsBuffer)
+{
+    if (strcmp(consequenceText, "[0]") == 0)
+    {
+        consequenceBuffer = domain::models::MeetingConsequence::Nothing;
+    }
+    else if (strcmp(consequenceText, "[repair]") == 0)
+    {
+        consequenceBuffer = domain::models::MeetingConsequence::Repair;
+    }
+    else if (consequenceText[1] == 'v')
+    {
+        consequenceBuffer = domain::models::MeetingConsequence::VictoryPoints;
+        ParseVictoryPoints(consequenceText, victoryPointsBuffer);
+    }
+    else
+    {
+        consequenceBuffer = domain::models::MeetingConsequence::Battle;
+        ParseDamage(consequenceText, damageMinBuffer, damageMaxBuffer);
+    }
+}
+
 void MeetingFileRepository::ParseDamage(const char* text,
                                         unsigned int& damageMinBuffer,
                                         unsigned int& damageMaxBuffer) const
@@ -13,11 +39,11 @@ void MeetingFileRepository::ParseDamage(const char* text,
     damageMaxBuffer = strtol(endptr + 1, &endptr, 10);
 }
 
-void MeetingFileRepository::ParseVictoryPoints(const char* text, unsigned int& victoryPointsBuffer) const
+void MeetingFileRepository::ParseVictoryPoints(const char* text, int& victoryPointsBuffer) const
 {
     char* endptr;
 
-    victoryPointsBuffer = strtol(text + 4, &endptr, 10);
+    victoryPointsBuffer = strtol(text + 3, &endptr, 10);
 }
 
 MeetingFileRepository::MeetingFileRepository(infra::RandomNumberGenerator& randomNumberGenerator)
@@ -39,41 +65,83 @@ void MeetingFileRepository::ReadMeetingsFromCsv(const char* filePath)
 
         row.ParseNextColumn(meeting.description, sizeof(meeting.description));
 
-        char fryConsequenceBuffer[64] = "";
-        row.ParseNextColumn(fryConsequenceBuffer, sizeof(fryConsequenceBuffer));
+        // Fry.
+        char columnBuffer[64] = "";
+        row.ParseNextColumn(columnBuffer, sizeof(columnBuffer));
 
-        if (strcmp(fryConsequenceBuffer, "[0]") == 0)
+        if (strcmp(columnBuffer, "[0]") == 0)
         {
             meeting.fryConsequence = domain::models::MeetingConsequence::Nothing;
         }
         else
         {
             meeting.fryConsequence = domain::models::MeetingConsequence::Battle;
-            ParseDamage(fryConsequenceBuffer, meeting.fryDamageMin, meeting.fryDamageMax);
+            ParseDamage(columnBuffer, meeting.fryDamageMin, meeting.fryDamageMax);
         }
 
+        // Leela.
         row.ParseNextColumn(meeting.leelaNegotiationText, sizeof(meeting.leelaNegotiationText));
 
-        char leelaConsequenceBuffer[64] = "";
-        row.ParseNextColumn(leelaConsequenceBuffer, sizeof(leelaConsequenceBuffer));
+        row.ParseNextColumn(columnBuffer, sizeof(columnBuffer));
 
-        if (strcmp(leelaConsequenceBuffer, "[0]") == 0)
+        ParseConsequence(columnBuffer,
+                         meeting.leelaNegotiationConsequence,
+                         meeting.leelaDamageMin,
+                         meeting.leelaDamageMax,
+                         meeting.leelaVictoryPoints);
+
+        // Bender failure.
+        row.ParseNextColumn(columnBuffer, sizeof(columnBuffer));
+
+        char* consequenceLoc = strchr(columnBuffer, '[');
+
+        if (consequenceLoc != nullptr)
         {
-            meeting.leelaNegotiationConsequence = domain::models::MeetingConsequence::Nothing;
-        }
-        else if (strcmp(leelaConsequenceBuffer, "[repair]") == 0)
-        {
-            meeting.leelaNegotiationConsequence = domain::models::MeetingConsequence::Repair;
-        }
-        else if (leelaConsequenceBuffer[1] == 'v')
-        {
-            meeting.leelaNegotiationConsequence = domain::models::MeetingConsequence::VictoryPoints;
-            ParseVictoryPoints(leelaConsequenceBuffer, meeting.leelaVictoryPoints);
+            // If there's a consequence. Parse it.
+            ParseConsequence(consequenceLoc,
+                             meeting.benderFailureConsequence,
+                             meeting.benderFailureDamageMin,
+                             meeting.benderFailureDamageMax,
+                             meeting.benderFailureVictoryPoints);
+
+            // Copy the text if there is any.
+            if (consequenceLoc != columnBuffer)
+            {
+                strncpy(meeting.benderFailureText, columnBuffer, consequenceLoc - columnBuffer);
+            }
         }
         else
         {
-            meeting.leelaNegotiationConsequence = domain::models::MeetingConsequence::Battle;
-            ParseDamage(leelaConsequenceBuffer, meeting.leelaDamageMin, meeting.leelaDamageMax);
+            // No consequence. Just text. Copy it.
+            meeting.benderFailureConsequence = domain::models::MeetingConsequence::Nothing;
+            strcpy(meeting.benderFailureText, columnBuffer);
+        }
+
+        // Bender success.
+        row.ParseNextColumn(columnBuffer, sizeof(columnBuffer));
+
+        consequenceLoc = strchr(columnBuffer, '[');
+
+        if (consequenceLoc != nullptr)
+        {
+            // If there's a consequence. Parse it.
+            ParseConsequence(consequenceLoc,
+                             meeting.benderSuccessConsequence,
+                             meeting.benderSuccessDamageMin,
+                             meeting.benderSuccessDamageMax,
+                             meeting.benderSuccessVictoryPoints);
+
+            // Copy the text if there is any.
+            if (consequenceLoc != columnBuffer)
+            {
+                strncpy(meeting.benderSuccessText, columnBuffer, consequenceLoc - columnBuffer);
+            }
+        }
+        else
+        {
+            // No consequence. Just text. Copy it.
+            meeting.benderSuccessConsequence = domain::models::MeetingConsequence::Nothing;
+            strcpy(meeting.benderSuccessText, columnBuffer);
         }
     }
 }

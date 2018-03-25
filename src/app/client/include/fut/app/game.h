@@ -47,8 +47,8 @@ class Game
 
     domain::models::Sector& GetOrGenerateSector(const infra::Point& sectorPoint);
     domain::models::Package GeneratePackage();
-    domain::models::Meeting GenerateMeeting();
     void RemovePackage();
+    void RemoveMeeting();
     void ChangeVictoryPoints(int points);
     void EndTurn();
     void MoveMeetings();

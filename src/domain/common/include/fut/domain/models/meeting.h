@@ -20,10 +20,19 @@ struct Meeting
     domain::models::MeetingConsequence leelaNegotiationConsequence;
     unsigned int leelaDamageMin = 0;
     unsigned int leelaDamageMax = 0;
-    unsigned int leelaVictoryPoints = 0;
+    int leelaVictoryPoints = 0;
 
+    char benderSuccessText[64] = "";
     domain::models::MeetingConsequence benderSuccessConsequence;
+    unsigned int benderSuccessDamageMin = 0;
+    unsigned int benderSuccessDamageMax = 0;
+    int benderSuccessVictoryPoints = 0;
+
+    char benderFailureText[64] = "";
     domain::models::MeetingConsequence benderFailureConsequence;
+    unsigned int benderFailureDamageMin = 0;
+    unsigned int benderFailureDamageMax = 0;
+    int benderFailureVictoryPoints = 0;
 }; // struct Meeting
 } // namespace fut::domain::models
 

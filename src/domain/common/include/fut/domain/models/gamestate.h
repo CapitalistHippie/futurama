@@ -7,6 +7,7 @@ enum class GameState
 {
     Headquarters,
     OnTheWay,
+    PickingMeetingCharacter,
     InMeeting,
     Win,
     Lose

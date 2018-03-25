@@ -17,8 +17,13 @@ class MeetingFileRepository : public MeetingRepository
     unsigned int meetingCount;
     domain::models::Meeting meetings[64];
 
+    void ParseConsequence(const char* consequenceText,
+                          domain::models::MeetingConsequence& consequenceBuffer,
+                          unsigned int& damageMinBuffer,
+                          unsigned int& damageMaxBuffer,
+                          int& victoryPointsBuffer);
     void ParseDamage(const char* text, unsigned int& damageMinBuffer, unsigned int& damageMaxBuffer) const;
-    void ParseVictoryPoints(const char* text, unsigned int& victoryPointsBuffer) const;
+    void ParseVictoryPoints(const char* text, int& victoryPointsBuffer) const;
 
   public:
     MeetingFileRepository(infra::RandomNumberGenerator& randomNumberGenerator);
