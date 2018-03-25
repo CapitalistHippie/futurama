@@ -71,6 +71,7 @@ class Game
 
     const domain::models::Game& GetData() const noexcept;
     const domain::models::Sector& GetCurrentSector() const;
+    const domain::models::ScanSector& GetCurrentScanSector() const;
     bool CanPickupPackage() const;
     bool IsShipNextToThing(domain::models::SectorFieldThing thing) const;
     bool IsShipNextToPackageDestination() const;
