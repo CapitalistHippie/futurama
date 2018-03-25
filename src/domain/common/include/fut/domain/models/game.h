@@ -16,6 +16,14 @@ struct Game
     Ship ship;
     Universe universe;
     Meeting* meeting = nullptr;
+
+    ~Game()
+    {
+        if (meeting != nullptr)
+        {
+            delete meeting;
+        }
+    }
 }; // struct Game
 } // namespace fut::domain::models
 

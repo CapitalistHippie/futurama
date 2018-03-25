@@ -3,6 +3,7 @@
 
 #include <fut/dal/meetingrepository.h>
 #include <fut/dal/packagerepository.h>
+#include <fut/domain/models/character.h>
 #include <fut/domain/models/game.h>
 #include <fut/domain/models/meeting.h>
 #include <fut/infra/point.h>
@@ -77,6 +78,7 @@ class Game
     void PickupPackage();
     void DeliverPackage();
     void SkipTurn();
+    void PickEncounterNegotiator(domain::models::Character negotiator);
 }; // class Game
 } // namespace fut::app
 

@@ -826,3 +826,16 @@ void Game::SkipTurn()
 {
     EndTurn();
 }
+
+void Game::PickEncounterNegotiator(domain::models::Character negotiator)
+{
+    if (data.gameState != domain::models::GameState::PickingMeetingCharacter)
+    {
+        throw std::exception(
+          "Can only pick an encounter negotiator if the game is in the PickingMeetingCharacter state.");
+    }
+
+    data.meeting->negotiator = negotiator;
+
+    SetState(domain::models::GameState::InMeeting);
+}

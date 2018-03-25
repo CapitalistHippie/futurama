@@ -1,6 +1,8 @@
 #ifndef FUTURAMA_FUT_UI_STATEHANDLERONTHEWAY_H_INCLUDED
 #define FUTURAMA_FUT_UI_STATEHANDLERONTHEWAY_H_INCLUDED
 
+#include <fut/domain/events/statechanged.h>
+
 #include "fut/ui/command.h"
 #include "fut/ui/statehandlerbase.h"
 
@@ -21,6 +23,7 @@ class StateHandlerOnTheWay : public StateHandlerBase
     void MovedToFieldGameEventHandler() const;
     void MovedToHeadquartersGameEventHandler() const;
     void PackagePickedUpGameEventHandler() const;
+    void StateChangedGameEventHandler(const domain::events::StateChanged& evt) const;
 
     void PrintCliWithPackageInfo() const;
     void PrintCli(const char* extra = nullptr) const;

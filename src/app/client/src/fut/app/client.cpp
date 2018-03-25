@@ -70,3 +70,8 @@ void Client::SkipTurn()
 {
     game.SkipTurn();
 }
+
+void Client::PickEncounterNegotiator(domain::models::Character negotiator)
+{
+    game.PickEncounterNegotiator(negotiator);
+}

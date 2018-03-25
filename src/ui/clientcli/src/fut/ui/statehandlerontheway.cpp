@@ -11,7 +11,9 @@
 #include <fut/infra/clihelpers.h>
 
 #include "fut/ui/statehandlerheadquarters.h"
+#include "fut/ui/statehandlerpickingmeetingcharacter.h"
 
+using namespace fut;
 using namespace fut::ui;
 
 void StateHandlerOnTheWay::ExitStateBase() noexcept
@@ -142,6 +144,16 @@ void StateHandlerOnTheWay::PackagePickedUpGameEventHandler() const
     PrintCliWithPackageInfo();
 }
 
+void StateHandlerOnTheWay::StateChangedGameEventHandler(const domain::events::StateChanged& evt) const
+{
+    if (evt.newState != domain::models::GameState::PickingMeetingCharacter)
+    {
+        return;
+    }
+
+    context->SetStateHandler<StateHandlerPickingMeetingCharacter>();
+}
+
 void StateHandlerOnTheWay::PrintCliWithPackageInfo() const
 {
     PrintCli();
@@ -252,6 +264,9 @@ void StateHandlerOnTheWay::EnterState()
 
     RegisterGameEventObserver<domain::events::PackagePickedUp>(
       std::bind(&StateHandlerOnTheWay::PackagePickedUpGameEventHandler, this));
+
+    RegisterGameEventObserver<domain::events::StateChanged>(
+      std::bind(&StateHandlerOnTheWay::StateChangedGameEventHandler, this, std::placeholders::_1));
 
     PrintCli();
 }

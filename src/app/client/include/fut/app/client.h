@@ -3,6 +3,7 @@
 
 #include <fut/dal/meetingfilerepository.h>
 #include <fut/dal/packagefilerepository.h>
+#include <fut/domain/models/character.h>
 #include <fut/infra/point.h>
 #include <fut/infra/randomnumbergenerator.h>
 #include <fut/infra/subject.h>
@@ -38,6 +39,7 @@ class Client
     void PickupPackage();
     void DeliverPackage();
     void SkipTurn();
+    void PickEncounterNegotiator(domain::models::Character negotiator);
 }; // class Client
 } // namespace fut::app
 

@@ -1,8 +1,8 @@
 #ifndef FUTURAMA_FUT_DOMAIN_MODELS_MEETING_H_INCLUDED
 #define FUTURAMA_FUT_DOMAIN_MODELS_MEETING_H_INCLUDED
 
+#include "fut/domain/models/character.h"
 #include "fut/domain/models/meetingconsequence.h"
-#include "fut/domain/models/meetingnegotiator.h"
 
 namespace fut::domain::models
 {
@@ -10,7 +10,7 @@ struct Meeting
 {
     char description[64] = "";
 
-    MeetingNegotiator negotiator;
+    Character negotiator;
 
     domain::models::MeetingConsequence fryConsequence;
     unsigned int fryDamageMin = 0;
@@ -36,4 +36,4 @@ struct Meeting
 }; // struct Meeting
 } // namespace fut::domain::models
 
-#endif // FUTURAMA_FUT_DOMAIN_MODELS_MEETING_H_INCLUDED
+#endif // #ifndef FUTURAMA_FUT_DOMAIN_MODELS_MEETING_H_INCLUDED
