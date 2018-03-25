@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <exception>
 
+#include <fut/domain/events/encountersmoved.h>
 #include <fut/domain/events/movedtofield.h>
 #include <fut/domain/events/movedtoheadquarters.h>
 #include <fut/domain/events/movedtosector.h>
@@ -496,6 +497,10 @@ void Game::EndTurn()
     }
 
     MoveEncounters();
+
+    // Throw event.
+    domain::events::EncountersMoved evt;
+    eventsSubject.NotifyObservers(evt);
 
     if (IsShipNextToThing(domain::models::SectorFieldThing::Encounter))
     {

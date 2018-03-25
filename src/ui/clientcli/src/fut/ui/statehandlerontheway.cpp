@@ -4,6 +4,7 @@
 
 #include <fut/app/errorcode.h>
 #include <fut/app/futuramaappexception.h>
+#include <fut/domain/events/encountersmoved.h>
 #include <fut/domain/events/movedtofield.h>
 #include <fut/domain/events/movedtoheadquarters.h>
 #include <fut/domain/events/movedtosector.h>
@@ -154,6 +155,11 @@ void StateHandlerOnTheWay::StateChangedGameEventHandler(const domain::events::St
     context->SetStateHandler<StateHandlerPickingEncounterNegotiator>();
 }
 
+void StateHandlerOnTheWay::EncountersMovedGameEventHandler() const
+{
+    PrintCli();
+}
+
 void StateHandlerOnTheWay::PrintCliWithPackageInfo() const
 {
     PrintCli();
@@ -165,8 +171,20 @@ void StateHandlerOnTheWay::PrintCliWithPackageInfo() const
 void StateHandlerOnTheWay::PrintCli(const char* extra) const
 {
     infra::ClearCli();
-    *outputStream << "You're on the route route to deliver your package. Navigate to the planet you need to deliver "
-                     "your package to.\n\n";
+
+    const auto& game = client->GetGame();
+    const auto& gameData = game.GetData();
+
+    if (game.HavePackage())
+    {
+        *outputStream
+          << "You're on the route route to deliver your package. Navigate to the planet you need to deliver "
+             "your package to.\n\n";
+    }
+    else
+    {
+        *outputStream << "Find a planet and see if they have a package that needs delivering.\n\n";
+    }
 
     PrintSector();
 
@@ -194,6 +212,8 @@ void StateHandlerOnTheWay::PrintSector() const
 {
     const auto& sector = client->GetGame().GetCurrentSector();
     const auto& ship = client->GetGame().GetData().ship;
+
+    *outputStream << "Sector " << ship.sectorPoint.x << " " << ship.sectorPoint.y << ".\n";
 
     for (unsigned int i = 0; i < sector.RowCount; ++i)
     {
@@ -267,6 +287,9 @@ void StateHandlerOnTheWay::EnterState()
 
     RegisterGameEventObserver<domain::events::StateChanged>(
       std::bind(&StateHandlerOnTheWay::StateChangedGameEventHandler, this, std::placeholders::_1));
+
+    RegisterGameEventObserver<domain::events::EncountersMoved>(
+      std::bind(&StateHandlerOnTheWay::EncountersMovedGameEventHandler, this));
 
     PrintCli();
 }

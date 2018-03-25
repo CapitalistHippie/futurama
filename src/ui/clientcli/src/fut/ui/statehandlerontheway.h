@@ -24,6 +24,7 @@ class StateHandlerOnTheWay : public StateHandlerBase
     void MovedToHeadquartersGameEventHandler() const;
     void PackagePickedUpGameEventHandler() const;
     void StateChangedGameEventHandler(const domain::events::StateChanged& evt) const;
+    void EncountersMovedGameEventHandler() const;
 
     void PrintCliWithPackageInfo() const;
     void PrintCli(const char* extra = nullptr) const;
