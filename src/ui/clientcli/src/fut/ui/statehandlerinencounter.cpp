@@ -11,6 +11,7 @@
 #include "fut/ui/statehandlergameend.h"
 #include "fut/ui/statehandlerontheway.h"
 
+using namespace fut;
 using namespace fut::ui;
 
 void StateHandlerInEncounter::ExitStateBase() noexcept
@@ -29,8 +30,33 @@ void StateHandlerInEncounter::ContinueCommandHandler() const
     }
 }
 
-void fut::ui::StateHandlerInEncounter::ShipRepairedGameEventHandler() const
+void StateHandlerInEncounter::ShipRepairedGameEventHandler() const
 {
+}
+
+void StateHandlerInEncounter::ShipDamagedGameEventHandler(const domain::events::ShipDamaged& evt) const
+{
+    *outputStream << "Your ship was hit for " << evt.newDamagePoints - evt.oldDamagePoints << " damage!\n";
+
+    if (client->GetGame().GetData().gameState == domain::models::GameState::Lose)
+    {
+        *outputStream << "Your ship was destroyed.\n";
+    }
+}
+
+void StateHandlerInEncounter::EnemyHitGameEventHandler(const domain::events::EnemyHit& evt) const
+{
+    *outputStream << "The enemy was hit! It has been hit " << evt.enemyHitCount << " times.\n";
+
+    if (evt.enemyHitCount == 3)
+    {
+        *outputStream << "The enemy has been destroyed!\n";
+    }
+}
+
+void StateHandlerInEncounter::EnemyMissedGameEventHandler(const domain::events::EnemyMissed& evt) const
+{
+    *outputStream << "The enemy was missed! It has been hit " << evt.enemyHitCount << " times.\n";
 }
 
 void StateHandlerInEncounter::PrintCli(const char* extra) const
@@ -86,6 +112,12 @@ void StateHandlerInEncounter::EnterState()
 
     RegisterGameEventObserver<domain::events::ShipRepaired>(
       std::bind(&StateHandlerInEncounter::ShipRepairedGameEventHandler, this));
+    RegisterGameEventObserver<domain::events::ShipDamaged>(
+      std::bind(&StateHandlerInEncounter::ShipDamagedGameEventHandler, this, std::placeholders::_1));
+    RegisterGameEventObserver<domain::events::EnemyHit>(
+      std::bind(&StateHandlerInEncounter::EnemyHitGameEventHandler, this, std::placeholders::_1));
+    RegisterGameEventObserver<domain::events::EnemyMissed>(
+      std::bind(&StateHandlerInEncounter::EnemyMissedGameEventHandler, this, std::placeholders::_1));
 
     PrintCli();
 }

@@ -3,6 +3,10 @@
 
 #include "fut/ui/statehandlerbase.h"
 
+#include <fut/domain/events/enemyhit.h>
+#include <fut/domain/events/enemymissed.h>
+#include <fut/domain/events/shipdamaged.h>
+
 namespace fut::ui
 {
 class StateHandlerInEncounter : public StateHandlerBase
@@ -12,6 +16,9 @@ class StateHandlerInEncounter : public StateHandlerBase
 
     void ContinueCommandHandler() const;
     void ShipRepairedGameEventHandler() const;
+    void ShipDamagedGameEventHandler(const domain::events::ShipDamaged& evt) const;
+    void EnemyHitGameEventHandler(const domain::events::EnemyHit& evt) const;
+    void EnemyMissedGameEventHandler(const domain::events::EnemyMissed& evt) const;
 
     void PrintCli(const char* extra = nullptr) const;
 

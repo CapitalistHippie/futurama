@@ -5,10 +5,13 @@
 
 #include <fut/domain/events/encountersmoved.h>
 #include <fut/domain/events/encounterstarted.h>
+#include <fut/domain/events/enemyhit.h>
+#include <fut/domain/events/enemymissed.h>
 #include <fut/domain/events/movedtofield.h>
 #include <fut/domain/events/movedtoheadquarters.h>
 #include <fut/domain/events/movedtosector.h>
 #include <fut/domain/events/packagepickedup.h>
+#include <fut/domain/events/shipdamaged.h>
 #include <fut/domain/events/shiprepaired.h>
 #include <fut/domain/events/statechanged.h>
 #include <fut/domain/events/victorypointschanged.h>
@@ -518,12 +521,6 @@ void Game::RemoveEncounter()
 
 void Game::RemoveEncounterInstance()
 {
-    if (data.encounterInstance == nullptr)
-    {
-        return;
-    }
-
-    delete data.encounterInstance;
     data.encounterInstance = nullptr;
 }
 
@@ -550,7 +547,14 @@ void Game::RepairShip()
 
 void Game::DamageShip(unsigned int damage)
 {
+    domain::events::ShipDamaged shipDamagedEvent;
+    shipDamagedEvent.oldDamagePoints = data.ship.damagePoints;
+
     data.ship.damagePoints += damage;
+
+    shipDamagedEvent.newDamagePoints = data.ship.damagePoints;
+
+    eventsSubject.NotifyObservers(shipDamagedEvent);
 
     if (data.ship.damagePoints >= 200)
     {
@@ -815,6 +819,7 @@ void Game::Reset()
 
     RemovePackage();
     RemoveEncounter();
+    RemoveEncounterInstance();
 }
 
 void Game::MoveToSector(const infra::Point& sectorPoint)
@@ -923,11 +928,11 @@ void Game::DeliverPackage()
         throw std::exception("Player is not next to the package destination.");
     }
 
+    ChangeVictoryPoints(1);
+
     RemovePackage();
 
     MoveToHeadQuarters();
-
-    ChangeVictoryPoints(1);
 
     if (data.player.victoryPoints >= 10)
     {
@@ -957,7 +962,8 @@ void Game::PickEncounterNegotiator(domain::models::Character negotiator)
     switch (negotiator)
     {
         case domain::models::Character::Fry:
-            encounter.consequence = domain::models::EncounterConsequence::Battle;
+            encounter.consequence = data.encounter->fryConsequence;
+
             encounter.damageMin = data.encounter->fryDamageMin;
             encounter.damageMax = data.encounter->fryDamageMax;
             break;
@@ -1039,10 +1045,20 @@ void Game::PickEncounterNegotiator(domain::models::Character negotiator)
                 {
                     encounter.enemyHitCount++;
 
+                    domain::events::EnemyHit enemyHitEvent;
+                    enemyHitEvent.enemyHitCount = encounter.enemyHitCount;
+                    eventsSubject.NotifyObservers(enemyHitEvent);
+
                     if (encounter.enemyHitCount == 3)
                     {
                         break;
                     }
+                }
+                else
+                {
+                    domain::events::EnemyMissed enemyMissedEvent;
+                    enemyMissedEvent.enemyHitCount = encounter.enemyHitCount;
+                    eventsSubject.NotifyObservers(enemyMissedEvent);
                 }
             }
             break;
@@ -1066,7 +1082,7 @@ void Game::PickEncounterNegotiator(domain::models::Character negotiator)
     }
 
     RemoveEncounter();
-    data.encounterInstance = nullptr;
+    RemoveEncounterInstance();
 
     if (data.gameState != domain::models::GameState::Lose)
     {

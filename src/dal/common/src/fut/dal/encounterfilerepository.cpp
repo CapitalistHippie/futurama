@@ -66,7 +66,7 @@ void EncounterFileRepository::ReadEncountersFromCsv(const char* filePath)
         row.ParseNextColumn(encounter.description, sizeof(encounter.description));
 
         // Fry.
-        char columnBuffer[64] = "";
+        char columnBuffer[256] = "";
         row.ParseNextColumn(columnBuffer, sizeof(columnBuffer));
 
         if (strcmp(columnBuffer, "[0]") == 0)

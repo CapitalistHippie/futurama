@@ -32,7 +32,7 @@ void StateHandlerGameEnd::PrintCli() const
     }
     else if (gameState == domain::models::GameState::Lose)
     {
-        *outputStream << "You lost the game. Better luck next time!\n\n";
+        *outputStream << "Your ship was destroyed. Better luck next time!\n\n";
     }
 
     *outputStream << "Available commands.\n"

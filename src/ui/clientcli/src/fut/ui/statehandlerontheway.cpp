@@ -96,6 +96,7 @@ void StateHandlerOnTheWay::ExamineCommandHandler() const
         PrintCli("You don't have a package.");
     }
 
+    client->SkipTurn();
     PrintCliWithPackageInfo();
 }
 
@@ -191,7 +192,8 @@ void StateHandlerOnTheWay::PrintCli(const char* extra) const
 
     *outputStream << "\n\n";
 
-    *outputStream << "Victory points: " << client->GetGame().GetData().player.victoryPoints << '.';
+    *outputStream << "Victory points:\t\t" << client->GetGame().GetData().player.victoryPoints << ".\n";
+    *outputStream << "Ship damage points:\t" << client->GetGame().GetData().ship.damagePoints << '.';
 
     *outputStream << "\n\n";
 

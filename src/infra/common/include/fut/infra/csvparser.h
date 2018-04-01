@@ -19,7 +19,7 @@ class CsvRow
   private:
     unsigned int parsedColumnCount;
     unsigned int columnCount;
-    char columns[64][64];
+    char columns[64][256];
 
   public:
     CsvRow()
