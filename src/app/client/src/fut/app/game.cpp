@@ -44,6 +44,7 @@ void Game::MoveToHeadQuarters()
     data.gameState = domain::models::GameState::Headquarters;
 
     RepairShip();
+    RemovePackage();
 
     // Throw event.
     domain::events::MovedToHeadquarters movedToHeadquartersEvent;
@@ -566,11 +567,13 @@ void Game::ChangeVictoryPoints(int points)
 {
     unsigned int oldPoints = data.player.victoryPoints;
 
-    data.player.victoryPoints += points;
-
-    if (data.player.victoryPoints < 0)
+    if (static_cast<int>(data.player.victoryPoints) + points < 0)
     {
         data.player.victoryPoints = 0;
+    }
+    else
+    {
+        data.player.victoryPoints += points;
     }
 
     if (oldPoints == data.player.victoryPoints)
