@@ -18,8 +18,10 @@ void fut::dal::PackageFileRepository::ReadPackagesFromCsv(const char* filePath)
 
     while (parser.ParseNextRow(row) != infra::ParsingStatus::EndOfFile)
     {
-        row.ParseNextColumn(packages[packageCount].contentsDescription, 64);
-        row.ParseNextColumn(packages[packageCount++].destinationDescription, 64);
+        row.ParseNextColumn(packages[packageCount].contentsDescription,
+                            sizeof(packages[packageCount].contentsDescription));
+        row.ParseNextColumn(packages[packageCount++].destinationDescription,
+                            sizeof(packages[packageCount++].destinationDescription));
     }
 }
 

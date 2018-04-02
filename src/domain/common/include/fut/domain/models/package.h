@@ -7,8 +7,8 @@ namespace fut::domain::models
 {
 struct Package
 {
-    char contentsDescription[64] = "";
-    char destinationDescription[64] = "";
+    char contentsDescription[256] = "";
+    char destinationDescription[256] = "";
 
     infra::Point destinationSectorPoint;
     infra::Point destinationFieldPoint;
