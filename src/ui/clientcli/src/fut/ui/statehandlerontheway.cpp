@@ -94,6 +94,7 @@ void StateHandlerOnTheWay::ExamineCommandHandler() const
     if (!client->GetGame().HavePackage())
     {
         PrintCli("You don't have a package.");
+        return;
     }
 
     client->SkipTurn();
@@ -105,6 +106,7 @@ void StateHandlerOnTheWay::DeliverCommandHandler() const
     if (!client->GetGame().HavePackage())
     {
         PrintCli("You don't have a package.");
+        return;
     }
 
     if (!client->GetGame().IsShipNextToThing(domain::models::SectorFieldThing::Planet))
