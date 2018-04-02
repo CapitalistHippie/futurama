@@ -21,7 +21,7 @@ void StateHandlerOnTheWay::ExitStateBase() noexcept
 {
 }
 
-void fut::ui::StateHandlerOnTheWay::MoveCommandHandler(const Command& command) const
+void fut::ui::StateHandlerOnTheWay::MoveCommandHandler(const Command& command)
 {
     if (command.argumentCount < 1)
     {
@@ -65,7 +65,7 @@ void fut::ui::StateHandlerOnTheWay::MoveCommandHandler(const Command& command) c
     }
 }
 
-void StateHandlerOnTheWay::PickupCommandHandler() const
+void StateHandlerOnTheWay::PickupCommandHandler()
 {
     if (client->GetGame().HavePackage())
     {
@@ -86,10 +86,9 @@ void StateHandlerOnTheWay::PickupCommandHandler() const
     }
 
     client->PickupPackage();
-    PrintCliWithPackageInfo();
 }
 
-void StateHandlerOnTheWay::ExamineCommandHandler() const
+void StateHandlerOnTheWay::ExamineCommandHandler()
 {
     if (!client->GetGame().HavePackage())
     {
@@ -97,11 +96,12 @@ void StateHandlerOnTheWay::ExamineCommandHandler() const
         return;
     }
 
+    showPackageInfo = true;
+
     client->SkipTurn();
-    PrintCliWithPackageInfo();
 }
 
-void StateHandlerOnTheWay::DeliverCommandHandler() const
+void StateHandlerOnTheWay::DeliverCommandHandler()
 {
     if (!client->GetGame().HavePackage())
     {
@@ -124,17 +124,17 @@ void StateHandlerOnTheWay::DeliverCommandHandler() const
     client->DeliverPackage();
 }
 
-void StateHandlerOnTheWay::SkipCommandHandler() const
+void StateHandlerOnTheWay::SkipCommandHandler()
 {
     client->SkipTurn();
 }
 
-void StateHandlerOnTheWay::MovedToSectorGameEventHandler() const
+void StateHandlerOnTheWay::MovedToSectorGameEventHandler()
 {
     PrintCli();
 }
 
-void StateHandlerOnTheWay::MovedToFieldGameEventHandler() const
+void StateHandlerOnTheWay::MovedToFieldGameEventHandler()
 {
     PrintCli();
 }
@@ -144,9 +144,9 @@ void StateHandlerOnTheWay::MovedToHeadquartersGameEventHandler() const
     context->SetStateHandler<StateHandlerHeadquarters>();
 }
 
-void StateHandlerOnTheWay::PackagePickedUpGameEventHandler() const
+void StateHandlerOnTheWay::PackagePickedUpGameEventHandler()
 {
-    PrintCliWithPackageInfo();
+    showPackageInfo = true;
 }
 
 void StateHandlerOnTheWay::StateChangedGameEventHandler(const domain::events::StateChanged& evt) const
@@ -159,20 +159,12 @@ void StateHandlerOnTheWay::StateChangedGameEventHandler(const domain::events::St
     context->SetStateHandler<StateHandlerPickingEncounterNegotiator>();
 }
 
-void StateHandlerOnTheWay::EncountersMovedGameEventHandler() const
+void StateHandlerOnTheWay::EncountersMovedGameEventHandler()
 {
     PrintCli();
 }
 
-void StateHandlerOnTheWay::PrintCliWithPackageInfo() const
-{
-    PrintCli();
-    PrintPackageInfo();
-
-    *outputStream << "\n\n";
-}
-
-void StateHandlerOnTheWay::PrintCli(const char* extra) const
+void StateHandlerOnTheWay::PrintCli(const char* extra)
 {
     infra::ClearCli();
 
@@ -210,6 +202,13 @@ void StateHandlerOnTheWay::PrintCli(const char* extra) const
     if (extra != nullptr)
     {
         *outputStream << extra << "\n\n";
+    }
+
+    if (showPackageInfo)
+    {
+        showPackageInfo = false;
+        PrintPackageInfo();
+        *outputStream << "\n\n";
     }
 }
 

@@ -11,23 +11,24 @@ namespace fut::ui
 class StateHandlerOnTheWay : public StateHandlerBase
 {
   private:
+    bool showPackageInfo = false;
+
     void ExitStateBase() noexcept override;
 
-    void MoveCommandHandler(const Command& command) const;
-    void PickupCommandHandler() const;
-    void ExamineCommandHandler() const;
-    void DeliverCommandHandler() const;
-    void SkipCommandHandler() const;
+    void MoveCommandHandler(const Command& command);
+    void PickupCommandHandler();
+    void ExamineCommandHandler();
+    void DeliverCommandHandler();
+    void SkipCommandHandler();
 
-    void MovedToSectorGameEventHandler() const;
-    void MovedToFieldGameEventHandler() const;
+    void MovedToSectorGameEventHandler();
+    void MovedToFieldGameEventHandler();
     void MovedToHeadquartersGameEventHandler() const;
-    void PackagePickedUpGameEventHandler() const;
+    void PackagePickedUpGameEventHandler();
     void StateChangedGameEventHandler(const domain::events::StateChanged& evt) const;
-    void EncountersMovedGameEventHandler() const;
+    void EncountersMovedGameEventHandler();
 
-    void PrintCliWithPackageInfo() const;
-    void PrintCli(const char* extra = nullptr) const;
+    void PrintCli(const char* extra = nullptr);
     void PrintSector() const;
     void PrintPackageInfo() const;
 
